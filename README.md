@@ -219,7 +219,7 @@ Semua `api/*` mengembalikan JSON.
 4. [x] Buat admin login page (form).
 5. [x] Buat admin dashboard static (tabel sample tickets).
 6. [x] Komponen modal, toast, file upload.
-7. [ ] Responsiveness & accessibility check.
+7. [x] Responsiveness & accessibility check.
 
 ### Sprint API & DB (setelah UI siap)
 

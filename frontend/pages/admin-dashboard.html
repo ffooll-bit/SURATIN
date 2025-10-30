@@ -95,43 +95,88 @@
         .sidebar-overlay.show {
             display: block;
         }
+        
+        /* Mobile Improvements */
+        @media (max-width: 576px) {
+            .container-fluid {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            .stats-card .card-body {
+                padding: 1rem;
+            }
+            .stats-icon {
+                width: 2.5rem;
+                height: 2.5rem;
+                font-size: 1rem;
+            }
+            .navbar-brand {
+                font-size: 1.1rem;
+            }
+            .btn {
+                min-height: 44px; /* WCAG touch target */
+            }
+            .dropdown-menu {
+                min-width: 280px;
+                max-width: calc(100vw - 2rem);
+            }
+        }
+        
+        /* Tablet Improvements */
+        @media (min-width: 577px) and (max-width: 991px) {
+            .sidebar .card {
+                margin-bottom: 0.5rem;
+            }
+        }
+        
+        /* Better focus indicators */
+        .btn:focus,
+        .nav-link:focus,
+        .form-control:focus,
+        .dropdown-toggle:focus {
+            outline: 2px solid #0d6efd;
+            outline-offset: 2px;
+        }
     </style>
 </head>
 <body>
+    <!-- Skip to main content link -->
+    <a href="#main-content" class="visually-hidden-focusable">Skip to main content</a>
+    
     <!-- Sidebar -->
-    <nav class="sidebar" id="sidebar">
+    <nav class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
         <div class="p-4">
             <h4 class="text-white mb-0">
-                <i class="bi bi-shield-check me-2"></i>
+                <i class="bi bi-shield-check me-2" aria-hidden="true"></i>
                 SURATIN
             </h4>
             <small class="text-white-50">Admin Panel</small>
         </div>
         
-        <ul class="nav nav-pills flex-column">
-            <li class="nav-item">
-                <a class="nav-link active" href="#dashboard">
-                    <i class="bi bi-speedometer2 me-2"></i>Dashboard
+        <ul class="nav nav-pills flex-column" role="menubar">
+            <li class="nav-item" role="none">
+                <a class="nav-link active" href="#dashboard" role="menuitem" aria-current="page">
+                    <i class="bi bi-speedometer2 me-2" aria-hidden="true"></i>Dashboard
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#tickets">
-                    <i class="bi bi-ticket-detailed me-2"></i>Tickets
+            <li class="nav-item" role="none">
+                <a class="nav-link" href="#tickets" role="menuitem">
+                    <i class="bi bi-ticket-detailed me-2" aria-hidden="true"></i>Tickets
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#templates">
-                    <i class="bi bi-file-earmark-text me-2"></i>Templates
+            <li class="nav-item" role="none">
+                <a class="nav-link" href="#templates" role="menuitem">
+                    <i class="bi bi-file-earmark-text me-2" aria-hidden="true"></i>Templates
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#settings">
-                    <i class="bi bi-gear me-2"></i>Pengaturan
+            <li class="nav-item" role="none">
+                <a class="nav-link" href="#settings" role="menuitem">
+                    <i class="bi bi-gear me-2" aria-hidden="true"></i>Pengaturan
                 </a>
             </li>
-            <li class="nav-item mt-3">
-                <a class="nav-link text-warning" href="#" onclick="logout()">
-                    <i class="bi bi-box-arrow-right me-2"></i>Logout
+            <li class="nav-item mt-3" role="none">
+                <a class="nav-link text-warning" href="#" onclick="logout()" role="menuitem">
+                    <i class="bi bi-box-arrow-right me-2" aria-hidden="true"></i>Logout
                 </a>
             </li>
         </ul>
@@ -153,23 +198,26 @@
     <!-- Main Content -->
     <div class="main-content">
         <!-- Top Navigation -->
-        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm" role="banner">
             <div class="container-fluid">
-                <button class="btn btn-outline-primary d-lg-none me-3" onclick="toggleSidebar()">
-                    <i class="bi bi-list"></i>
+                <button class="btn btn-outline-primary d-lg-none me-3" onclick="toggleSidebar()" 
+                        aria-label="Toggle sidebar navigation" aria-expanded="false" aria-controls="sidebar">
+                    <i class="bi bi-list" aria-hidden="true"></i>
                 </button>
                 
                 <span class="navbar-brand mb-0 h1">Dashboard</span>
                 
                 <div class="ms-auto d-flex align-items-center">
                     <div class="dropdown">
-                        <button class="btn btn-outline-secondary position-relative me-3" type="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-bell"></i>
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        <button class="btn btn-outline-secondary position-relative me-3" type="button" 
+                                data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notifications">
+                            <i class="bi bi-bell" aria-hidden="true"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                  aria-label="3 new notifications">
                                 3
                             </span>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
+                        <ul class="dropdown-menu dropdown-menu-end" aria-label="Notification list">
                             <li><h6 class="dropdown-header">Notifikasi</h6></li>
                             <li><a class="dropdown-item" href="#">Ticket baru: TCK-20241029-0015</a></li>
                             <li><a class="dropdown-item" href="#">Ticket baru: TCK-20241029-0014</a></li>
@@ -181,7 +229,7 @@
         </nav>
 
         <!-- Dashboard Content -->
-        <div class="container-fluid p-4">
+        <main id="main-content" class="container-fluid p-4" role="main">
             <!-- Statistics Cards -->
             <div class="row mb-4">
                 <div class="col-xl-3 col-md-6 mb-3">

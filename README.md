@@ -216,7 +216,7 @@ Semua `api/*` mengembalikan JSON.
 1. [x] Buat halaman `ticket-form.html` (static) — form lengkap + client validation.
 2. [x] Buat `success.html` dengan menampilkan ticket_code (mock).
 3. [x] Buat `check-status.html` + mock status responses.
-4. [ ] Buat admin login page (form).
+4. [x] Buat admin login page (form).
 5. [ ] Buat admin dashboard static (tabel sample tickets).
 6. [ ] Komponen modal, toast, file upload.
 7. [ ] Responsiveness & accessibility check.

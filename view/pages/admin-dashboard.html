@@ -199,13 +199,13 @@
     <div class="main-content">
         <!-- Top Navigation -->
         <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm" role="banner">
-            <div class="container-fluid">
+            <div class="container-fluid p-2">
                 <button class="btn btn-outline-primary d-lg-none me-3" onclick="toggleSidebar()" 
                         aria-label="Toggle sidebar navigation" aria-expanded="false" aria-controls="sidebar">
                     <i class="bi bi-list" aria-hidden="true"></i>
                 </button>
                 
-                <span class="navbar-brand mb-0 h1">Dashboard</span>
+                <span class="navbar-brand mb-0 h1 p-2">Dashboard</span>
                 
                 <div class="ms-auto d-flex align-items-center">
                     <div class="dropdown">
@@ -239,83 +239,6 @@
     <!-- Scripts -->
     <script src="view/assets/bootstrap-5.3.8/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Sample tickets data
-        const sampleTickets = [
-            {
-                id: 'TCK-20241029-0001',
-                nama: 'Muhammad Arif',
-                npm: '2023110001',
-                jenis_surat: 'Surat Keterangan Aktif Kuliah',
-                tanggal: '2024-10-29',
-                status: 'generated'
-            },
-            {
-                id: 'TCK-20241029-0002',
-                nama: 'Siti Nurhaliza',
-                npm: '2023110025',
-                jenis_surat: 'Surat Pengantar Magang',
-                tanggal: '2024-10-28',
-                status: 'in_review'
-            },
-            {
-                id: 'TCK-20241027-0012',
-                nama: 'Budi Santoso',
-                npm: '2023110045',
-                jenis_surat: 'Surat Rekomendasi',
-                tanggal: '2024-10-27',
-                status: 'rejected'
-            },
-            {
-                id: 'TCK-20241026-0008',
-                nama: 'Andi Wijaya',
-                npm: '2023110067',
-                jenis_surat: 'Surat Pengantar Penelitian',
-                tanggal: '2024-10-26',
-                status: 'valid'
-            },
-            {
-                id: 'TCK-20241025-0003',
-                nama: 'Lisa Permata',
-                npm: '2023110089',
-                jenis_surat: 'Surat Keterangan Aktif Kuliah',
-                tanggal: '2024-10-25',
-                status: 'submitted'
-            },
-            {
-                id: 'TCK-20241025-0004',
-                nama: 'Roni Hermawan',
-                npm: '2023110012',
-                jenis_surat: 'Surat Pengantar Magang',
-                tanggal: '2024-10-25',
-                status: 'generated'
-            },
-            {
-                id: 'TCK-20241024-0007',
-                nama: 'Maya Sari',
-                npm: '2023110034',
-                jenis_surat: 'Surat Rekomendasi',
-                tanggal: '2024-10-24',
-                status: 'in_review'
-            },
-            {
-                id: 'TCK-20241023-0015',
-                nama: 'Dedi Kurniawan',
-                npm: '2023110056',
-                jenis_surat: 'Surat Keterangan Aktif Kuliah',
-                tanggal: '2024-10-23',
-                status: 'generated'
-            }
-        ];
-
-        // Status configuration
-        const statusConfig = {
-            submitted: { class: 'bg-primary', text: 'Submitted' },
-            in_review: { class: 'bg-warning', text: 'In Review' },
-            valid: { class: 'bg-info', text: 'Valid' },
-            rejected: { class: 'bg-danger', text: 'Rejected' },
-            generated: { class: 'bg-success', text: 'Generated' }
-        };
-
         // Toggle sidebar
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
@@ -336,98 +259,6 @@
                 // Redirect to login if no session
                 window.location.href = 'index.php?page=admin&action=login';
             }
-        }
-
-        // Render tickets table
-        function renderTicketsTable(tickets = sampleTickets) {
-            const tbody = document.querySelector('#ticketsTable tbody');
-            tbody.innerHTML = '';
-
-            tickets.forEach(ticket => {
-                const statusBadge = statusConfig[ticket.status];
-                const row = document.createElement('tr');
-                
-                row.innerHTML = `
-                    <td class="fw-bold text-primary">${ticket.id}</td>
-                    <td>${ticket.nama}</td>
-                    <td>${ticket.npm}</td>
-                    <td>${ticket.jenis_surat}</td>
-                    <td>${formatDate(ticket.tanggal)}</td>
-                    <td>
-                        <span class="badge status-badge ${statusBadge.class}">${statusBadge.text}</span>
-                    </td>
-                    <td>
-                        <div class="btn-group btn-group-sm">
-                            <button class="btn btn-outline-primary" onclick="viewTicket('${ticket.id}')" title="Detail">
-                                <i class="bi bi-eye"></i>
-                            </button>
-                            <button class="btn btn-outline-success" onclick="approveTicket('${ticket.id}')" title="Approve" ${ticket.status !== 'submitted' && ticket.status !== 'in_review' ? 'disabled' : ''}>
-                                <i class="bi bi-check"></i>
-                            </button>
-                            <button class="btn btn-outline-danger" onclick="rejectTicket('${ticket.id}')" title="Reject" ${ticket.status !== 'submitted' && ticket.status !== 'in_review' ? 'disabled' : ''}>
-                                <i class="bi bi-x"></i>
-                            </button>
-                        </div>
-                    </td>
-                `;
-                
-                tbody.appendChild(row);
-            });
-        }
-
-        // Filter tickets
-        function filterTickets() {
-            const search = document.getElementById('searchInput').value.toLowerCase();
-            const statusFilter = document.getElementById('statusFilter').value;
-            const letterTypeFilter = document.getElementById('letterTypeFilter').value;
-            const dateFilter = document.getElementById('dateFilter').value;
-
-            const filtered = sampleTickets.filter(ticket => {
-                const matchSearch = ticket.nama.toLowerCase().includes(search) || 
-                                  ticket.npm.includes(search) || 
-                                  ticket.id.toLowerCase().includes(search);
-                const matchStatus = !statusFilter || ticket.status === statusFilter;
-                const matchType = !letterTypeFilter || ticket.jenis_surat === letterTypeFilter;
-                const matchDate = !dateFilter || ticket.tanggal === dateFilter;
-
-                return matchSearch && matchStatus && matchType && matchDate;
-            });
-
-            renderTicketsTable(filtered);
-        }
-
-        // Clear filters
-        function clearFilters() {
-            document.getElementById('searchInput').value = '';
-            document.getElementById('statusFilter').value = '';
-            document.getElementById('letterTypeFilter').value = '';
-            document.getElementById('dateFilter').value = '';
-            renderTicketsTable();
-        }
-
-        // Action functions
-        function viewTicket(ticketId) {
-            alert(`Viewing ticket: ${ticketId}`);
-            // In real app, redirect to ticket detail page
-        }
-
-        function approveTicket(ticketId) {
-            if (confirm(`Approve ticket ${ticketId}?`)) {
-                alert(`Ticket ${ticketId} approved`);
-                // In real app, make API call
-            }
-        }
-
-        function rejectTicket(ticketId) {
-            const reason = prompt(`Reject ticket ${ticketId}. Enter reason:`);
-            if (reason) {
-                alert(`Ticket ${ticketId} rejected: ${reason}`);
-                // In real app, make API call
-            }
-        }
-
-        function exportData() {
-            alert('Exporting data... (Feature not implemented in demo)');
         }
 
         function logout() {
@@ -468,48 +299,149 @@
             currentSection = section;
         }
         
+        // Content-specific script management
+        const loadedScripts = new Set();
+        
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                if (loadedScripts.has(src)) {
+                    resolve();
+                    return;
+                }
+                
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = () => {
+                    loadedScripts.add(src);
+                    resolve();
+                };
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+        
+        function executeScriptsInContainer(container) {
+            const scripts = container.querySelectorAll('script');
+            const promises = [];
+            
+            scripts.forEach(script => {
+                if (script.src) {
+                    // External script
+                    promises.push(loadScript(script.src));
+                } else {
+                    // Inline script
+                    promises.push(new Promise(resolve => {
+                        const newScript = document.createElement('script');
+                        newScript.textContent = script.textContent;
+                        document.head.appendChild(newScript);
+                        resolve();
+                    }));
+                }
+                script.remove();
+            });
+            
+            return Promise.all(promises);
+        }
+        
         function loadSectionContent(section) {
             const container = document.getElementById('content-container');
             
             switch(section) {
                 case 'dashboard':
-                    fetch('view/components/dashboard-content.html')
+                    // Load dashboard-specific script first
+                    loadScript('./view/assets/js/dashboard.js')
+                        .then(() => {
+                            return fetch('./view/components/dashboard-content.html');
+                        })
                         .then(response => response.text())
                         .then(html => {
                             container.innerHTML = html;
-                            executeScriptsInContainer(container);
+                            // Execute any inline scripts in the loaded content
+                            return executeScriptsInContainer(container);
+                        })
+                        .then(() => {
+                            // Initialize dashboard after everything is loaded
+                            setTimeout(() => {
+                                if (typeof initializeDashboard === 'function') {
+                                    initializeDashboard();
+                                } else {
+                                    console.error('initializeDashboard function not found');
+                                }
+                            }, 100);
                         })
                         .catch(error => {
                             console.error('Error loading dashboard:', error);
                             container.innerHTML = '<div class="alert alert-danger">Error loading dashboard content</div>';
                         });
                     break;
+                    
                 case 'tickets':
-                    // Will be implemented next
-                    container.innerHTML = '<div class="alert alert-info">Tickets section - Coming soon!</div>';
+                    // Load tickets-specific script when implemented
+                    fetch('./view/components/tickets-content.html')
+                        .then(response => response.text())
+                        .then(html => {
+                            container.innerHTML = html;
+                            return executeScriptsInContainer(container);
+                        })
+                        .then(() => {
+                            // Initialize tickets functionality
+                            if (typeof initializeTickets === 'function') {
+                                initializeTickets();
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error loading tickets:', error);
+                            container.innerHTML = '<div class="alert alert-info">Tickets section - Coming soon!</div>';
+                        });
                     break;
+                    
                 case 'templates':
-                    container.innerHTML = '<div class="alert alert-info">Templates section - Coming soon!</div>';
+                    // Load templates-specific script when implemented
+                    fetch('./view/components/templates-content.html')
+                        .then(response => response.text())
+                        .then(html => {
+                            container.innerHTML = html;
+                            return executeScriptsInContainer(container);
+                        })
+                        .then(() => {
+                            // Initialize templates functionality
+                            if (typeof initializeTemplates === 'function') {
+                                initializeTemplates();
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error loading templates:', error);
+                            container.innerHTML = '<div class="alert alert-info">Templates section - Coming soon!</div>';
+                        });
                     break;
+                    
                 case 'settings':
-                    container.innerHTML = '<div class="alert alert-info">Settings section - Coming soon!</div>';
+                    // Load settings-specific script when implemented
+                    fetch('./view/components/settings-content.html')
+                        .then(response => response.text())
+                        .then(html => {
+                            container.innerHTML = html;
+                            return executeScriptsInContainer(container);
+                        })
+                        .then(() => {
+                            // Initialize settings functionality
+                            if (typeof initializeSettings === 'function') {
+                                initializeSettings();
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error loading settings:', error);
+                            container.innerHTML = '<div class="alert alert-info">Settings section - Coming soon!</div>';
+                        });
                     break;
+                    
                 default:
                     container.innerHTML = '<div class="alert alert-warning">Section not found</div>';
             }
         }
         
-        function executeScriptsInContainer(container) {
-            const scripts = container.querySelectorAll('script');
-            scripts.forEach(script => {
-                const newScript = document.createElement('script');
-                newScript.textContent = script.textContent;
-                document.head.appendChild(newScript);
-            });
-        }
-
         // Update navigation event listeners
-        document.querySelectorAll('.sidebar .nav-link[href^="#"]').forEach(link => {
+        document.querySelectorAll('.sidebar .nav-link[href^="#"]:not([onclick])').forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
                 const section = this.getAttribute('href').substring(1);

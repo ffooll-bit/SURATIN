@@ -248,26 +248,27 @@ Semua endpoint di `controller/api/*` mengembalikan JSON.
 ### Sprint UI (tahap awal)
 
 1. [x] Buat `index.php` sebagai landing page dengan routing sederhana.
-2. [x] Buat halaman `view/ticket-form.html` (static) — form lengkap + client validation.
-3. [x] Buat `view/success.html` dengan menampilkan ticket_code (mock).
-4. [x] Buat `view/check-status.html` + mock status responses.
-5. [x] Buat `view/admin/login.html` (form login).
-6. [x] Buat `view/admin/dashboard.html` static (tabel sample tickets).
-7. [x] Komponen modal, toast, file upload di `view/components/`.
+2. [x] Buat halaman `view/pages/ticket-form.html` (static) — form lengkap + client validation.
+3. [x] Buat `view/pages/success.html` dengan menampilkan ticket_code (mock).
+4. [x] Buat `view/pages/check-status.html` + mock status responses.
+5. [x] Buat `view/pages/admin-login.html` (form login).
+6. [x] Buat `view/pages/admin-dashboard.html` dengan komponen modular.
+7. [x] Komponen `view/components/dashboard-content.html` dengan data real.
 8. [x] Responsiveness & accessibility check.
 
 ### Sprint API & DB (setelah UI siap)
 
 9. [x] Buat DB schema (`sql/create-schema.sql`) dan `controller/config/database.php`.
-10. [ ] Implement `model/Ticket.php` untuk CRUD operations.
-11. [ ] Implement `controller/api/tickets.php` (simpan: tickets + files).
-12. [ ] Implement `controller/api/status.php` untuk cek status publik.
-13. [x] Implement `model/Admin.php` dan `controller/api/auth.php`.
-14. [ ] Implement ticket review di `controller/admin/ticket-review.php`.
-15. [ ] Implement `model/Template.php` dan template manager.
-16. [ ] Implement generate surat di `controller/helpers/docx-generator.php`.
-17. [ ] Implement notifikasi di `controller/helpers/mailer.php` dan `whatsapp.php`.
-18. [ ] Add logging dan error handling.
+10. [x] Implement `model/Ticket.php` untuk CRUD operations.
+11. [x] Implement `controller/api/dashboard.php` untuk statistik dan aktivitas real-time.
+12. [ ] Implement `controller/api/tickets.php` (simpan: tickets + files).
+13. [ ] Implement `controller/api/status.php` untuk cek status publik.
+14. [x] Implement `model/Admin.php` dan `controller/api/auth.php`.
+15. [ ] Implement ticket review di `controller/admin/ticket-review.php`.
+16. [ ] Implement `model/Template.php` dan template manager.
+17. [ ] Implement generate surat di `controller/helpers/docx-generator.php`.
+18. [ ] Implement notifikasi di `controller/helpers/mailer.php` dan `whatsapp.php`.
+19. [ ] Add logging dan error handling.
 
 ### Sprint finishing
 

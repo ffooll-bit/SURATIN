@@ -53,34 +53,53 @@ try {
                     break;
                     
                 case 'activity':
-                    // Get recent activity
+                    // Get recent activity with pagination
+                    $page = intval($_GET['page'] ?? 1);
                     $limit = intval($_GET['limit'] ?? 10);
-                    $activities = $ticketModel->getRecentActivity($limit);
+                    $statusFilter = $_GET['status'] ?? '';
                     
-                    // Format activities for display
-                    $formattedActivities = [];
-                    foreach ($activities as $activity) {
-                        $timeAgo = timeAgo($activity['updated_at']);
-                        $statusInfo = getStatusInfo($activity['status']);
-                        
-                        $formattedActivities[] = [
-                            'id' => $activity['ticket_code'],
-                            'title' => getActivityTitle($activity),
-                            'description' => "{$activity['jenis_surat']} - {$activity['nama']}",
-                            'time' => $timeAgo,
-                            'icon' => $statusInfo['icon'],
-                            'color' => $statusInfo['color'],
-                            'status' => $activity['status'],
-                            'created_at' => $activity['created_at'],
-                            'updated_at' => $activity['updated_at']
-                        ];
+                    // Build filters
+                    $filters = [];
+                    if (!empty($statusFilter)) {
+                        $filters['status'] = $statusFilter;
                     }
                     
-                    echo json_encode([
-                        'success' => true,
-                        'data' => $formattedActivities,
-                        'count' => count($formattedActivities)
-                    ]);
+                    // Get paginated tickets
+                    $result = $ticketModel->getAll($filters, $page, $limit);
+                    
+                    if ($result['success']) {
+                        $formattedActivities = [];
+                        foreach ($result['data'] as $ticket) {
+                            $timeAgo = timeAgo($ticket['updated_at']);
+                            $statusInfo = getStatusInfo($ticket['status']);
+                            
+                            $formattedActivities[] = [
+                                'id' => $ticket['ticket_code'],
+                                'title' => getActivityTitle($ticket),
+                                'description' => "{$ticket['jenis_surat']} - {$ticket['nama']}",
+                                'time' => $timeAgo,
+                                'icon' => $statusInfo['icon'],
+                                'color' => $statusInfo['color'],
+                                'status' => $ticket['status'],
+                                'admin_note' => $ticket['admin_note'],
+                                'created_at' => $ticket['created_at'],
+                                'updated_at' => $ticket['updated_at']
+                            ];
+                        }
+                        
+                        echo json_encode([
+                            'success' => true,
+                            'data' => $formattedActivities,
+                            'pagination' => [
+                                'current_page' => $result['page'],
+                                'per_page' => $result['limit'],
+                                'total' => $result['total'],
+                                'last_page' => $result['total_pages']
+                            ]
+                        ]);
+                    } else {
+                        echo json_encode(['success' => false, 'error' => $result['error']]);
+                    }
                     break;
                     
                 case 'today_summary':
@@ -127,6 +146,56 @@ try {
                     ]);
                     break;
                     
+                case 'export_activity':
+                    // Export activity data as CSV
+                    $statusFilter = $_GET['status'] ?? '';
+                    $format = $_GET['format'] ?? 'csv';
+                    
+                    $filters = [];
+                    if (!empty($statusFilter)) {
+                        $filters['status'] = $statusFilter;
+                    }
+                    
+                    // Get all activities (no pagination for export)
+                    $result = $ticketModel->getAll($filters, 1, 1000);
+                    
+                    if ($result['success'] && $format === 'csv') {
+                        header('Content-Type: text/csv');
+                        header('Content-Disposition: attachment; filename="activity_export_' . date('Y-m-d') . '.csv"');
+                        
+                        $output = fopen('php://output', 'w');
+                        
+                        // CSV headers
+                        fputcsv($output, [
+                            'Ticket Code',
+                            'Name',
+                            'Letter Type',
+                            'Status',
+                            'Admin Note',
+                            'Created Date',
+                            'Updated Date'
+                        ]);
+                        
+                        // CSV data
+                        foreach ($result['data'] as $ticket) {
+                            fputcsv($output, [
+                                $ticket['ticket_code'],
+                                $ticket['nama'],
+                                $ticket['jenis_surat'],
+                                $ticket['status'],
+                                $ticket['admin_note'] ?? '',
+                                $ticket['created_at'],
+                                $ticket['updated_at']
+                            ]);
+                        }
+                        
+                        fclose($output);
+                        exit;
+                    } else {
+                        echo json_encode(['success' => false, 'error' => 'Export failed']);
+                    }
+                    break;
+
                 default:
                     http_response_code(400);
                     echo json_encode(['error' => 'Invalid action']);

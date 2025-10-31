@@ -27,7 +27,296 @@ function systemSettings() {
 }
 
 function viewAllActivity() {
-    alert('View All Activity - Feature coming soon!');
+    showActivityModal();
+}
+
+function showActivityModal() {
+    // Check if modal exists, if not create it
+    let modal = document.getElementById('activityModal');
+    if (!modal) {
+        createActivityModal();
+        modal = document.getElementById('activityModal');
+    }
+    
+    // Show the modal
+    const bsModal = new bootstrap.Modal(modal);
+    bsModal.show();
+    
+    // Load activity data
+    loadAllActivity(1); // Load first page
+}
+
+function createActivityModal() {
+    const modalHTML = `
+        <div class="modal fade" id="activityModal" tabindex="-1" aria-labelledby="activityModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="activityModalLabel">
+                            <i class="bi bi-clock-history me-2"></i>All Recent Activity
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex gap-2">
+                                <select class="form-select form-select-sm" id="activityStatusFilter" style="width: auto;">
+                                    <option value="">All Status</option>
+                                    <option value="submitted">Submitted</option>
+                                    <option value="in_review">In Review</option>
+                                    <option value="valid">Valid</option>
+                                    <option value="rejected">Rejected</option>
+                                    <option value="generated">Generated</option>
+                                </select>
+                                <button class="btn btn-sm btn-outline-primary" onclick="loadAllActivity(1)">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </button>
+                            </div>
+                            <small class="text-muted" id="activityCount">Loading...</small>
+                        </div>
+                        
+                        <div id="allActivityList" class="list-group" style="max-height: 400px; overflow-y: auto;">
+                            <!-- Activity items will be loaded here -->
+                            <div class="text-center py-4">
+                                <div class="spinner-border spinner-border-sm text-muted" role="status"></div>
+                                <div class="mt-2 text-muted">Loading all activity...</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <nav aria-label="Activity pagination" class="mt-3">
+                            <ul class="pagination pagination-sm justify-content-center mb-0" id="activityPagination">
+                                <!-- Pagination will be generated here -->
+                            </ul>
+                        </nav>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" onclick="exportActivityData()">
+                            <i class="bi bi-download me-1"></i>Export CSV
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+function loadAllActivity(page = 1, limit = 15) {
+    const container = document.getElementById('allActivityList');
+    const countElement = document.getElementById('activityCount');
+    const statusFilter = document.getElementById('activityStatusFilter')?.value || '';
+    
+    // Show loading state
+    if (page === 1) {
+        container.innerHTML = `
+            <div class="text-center py-4">
+                <div class="spinner-border spinner-border-sm text-muted" role="status"></div>
+                <div class="mt-2 text-muted">Loading activities...</div>
+            </div>
+        `;
+    }
+    
+    // Build query parameters
+    const params = new URLSearchParams({
+        action: 'activity',
+        page: page,
+        limit: limit
+    });
+    
+    if (statusFilter) {
+        params.append('status', statusFilter);
+    }
+    
+    fetch(`./controller/api/dashboard.php?${params.toString()}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(result => {
+            if (result.success) {
+                renderAllActivity(result.data, result.pagination);
+                updateActivityCount(result.pagination);
+                updateActivityPagination(result.pagination);
+            } else {
+                showAllActivityError('Failed to load activity data');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading all activity:', error);
+            showAllActivityError('Connection error');
+        });
+}
+
+function renderAllActivity(activities, pagination) {
+    const container = document.getElementById('allActivityList');
+    
+    if (activities.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-5">
+                <i class="bi bi-inbox fs-2 d-block mb-3 text-muted"></i>
+                <h6 class="text-muted">No Activity Found</h6>
+                <p class="small text-muted mb-0">No activities match your current filter criteria.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = activities.map((activity, index) => `
+        <div class="list-group-item d-flex align-items-center border-0 ${index > 0 ? 'border-top' : ''}">
+            <div class="me-3">
+                <div class="bg-${activity.color} bg-opacity-10 rounded-circle p-2">
+                    <i class="bi ${activity.icon} text-${activity.color}"></i>
+                </div>
+            </div>
+            <div class="flex-grow-1">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="fw-medium">${activity.title}</div>
+                        <small class="text-muted">${activity.description}</small>
+                    </div>
+                    <div class="text-end ms-3">
+                        <small class="text-muted d-block">${activity.time}</small>
+                        ${activity.id ? `<small class="text-primary fw-medium" style="font-size: 0.7rem;">${activity.id}</small>` : ''}
+                    </div>
+                </div>
+                ${activity.admin_note ? `<div class="mt-1"><small class="text-info"><i class="bi bi-sticky me-1"></i>${activity.admin_note}</small></div>` : ''}
+            </div>
+        </div>
+    `).join('');
+}
+
+function updateActivityCount(pagination) {
+    const countElement = document.getElementById('activityCount');
+    if (countElement && pagination) {
+        const start = ((pagination.current_page - 1) * pagination.per_page) + 1;
+        const end = Math.min(pagination.current_page * pagination.per_page, pagination.total);
+        countElement.textContent = `Showing ${start}-${end} of ${pagination.total} activities`;
+    }
+}
+
+function updateActivityPagination(pagination) {
+    const paginationElement = document.getElementById('activityPagination');
+    if (!paginationElement || !pagination) return;
+    
+    const { current_page, last_page, total } = pagination;
+    
+    if (last_page <= 1) {
+        paginationElement.innerHTML = '';
+        return;
+    }
+    
+    let paginationHTML = '';
+    
+    // Previous button
+    paginationHTML += `
+        <li class="page-item ${current_page <= 1 ? 'disabled' : ''}">
+            <button class="page-link" onclick="loadAllActivity(${current_page - 1})" ${current_page <= 1 ? 'disabled' : ''}>
+                <i class="bi bi-chevron-left"></i>
+            </button>
+        </li>
+    `;
+    
+    // Page numbers
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, current_page - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(last_page, startPage + maxVisiblePages - 1);
+    
+    // Adjust start page if we're near the end
+    if (endPage - startPage < maxVisiblePages - 1) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    // First page and ellipsis
+    if (startPage > 1) {
+        paginationHTML += `
+            <li class="page-item">
+                <button class="page-link" onclick="loadAllActivity(1)">1</button>
+            </li>
+        `;
+        if (startPage > 2) {
+            paginationHTML += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        }
+    }
+    
+    // Visible page numbers
+    for (let page = startPage; page <= endPage; page++) {
+        paginationHTML += `
+            <li class="page-item ${page === current_page ? 'active' : ''}">
+                <button class="page-link" onclick="loadAllActivity(${page})">${page}</button>
+            </li>
+        `;
+    }
+    
+    // Last page and ellipsis
+    if (endPage < last_page) {
+        if (endPage < last_page - 1) {
+            paginationHTML += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        }
+        paginationHTML += `
+            <li class="page-item">
+                <button class="page-link" onclick="loadAllActivity(${last_page})">${last_page}</button>
+            </li>
+        `;
+    }
+    
+    // Next button
+    paginationHTML += `
+        <li class="page-item ${current_page >= last_page ? 'disabled' : ''}">
+            <button class="page-link" onclick="loadAllActivity(${current_page + 1})" ${current_page >= last_page ? 'disabled' : ''}>
+                <i class="bi bi-chevron-right"></i>
+            </button>
+        </li>
+    `;
+    
+    paginationElement.innerHTML = paginationHTML;
+}
+
+function showAllActivityError(message) {
+    const container = document.getElementById('allActivityList');
+    if (container) {
+        container.innerHTML = `
+            <div class="text-center py-4">
+                <i class="bi bi-exclamation-triangle text-danger fs-4 d-block mb-2"></i>
+                <div class="fw-medium text-danger">Unable to Load Activities</div>
+                <small class="text-muted">${message}</small>
+                <div class="mt-2">
+                    <button class="btn btn-sm btn-outline-primary" onclick="loadAllActivity(1)">
+                        <i class="bi bi-arrow-clockwise me-1"></i>Try Again
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+}
+
+function exportActivityData() {
+    // Simple CSV export functionality
+    const statusFilter = document.getElementById('activityStatusFilter')?.value || '';
+    
+    const params = new URLSearchParams({
+        action: 'export_activity',
+        format: 'csv'
+    });
+    
+    if (statusFilter) {
+        params.append('status', statusFilter);
+    }
+    
+    // Create download link
+    const downloadUrl = `./controller/api/dashboard.php?${params.toString()}`;
+    
+    // Create temporary link and trigger download
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = `activity_export_${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 // Load dashboard statistics

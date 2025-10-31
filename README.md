@@ -253,7 +253,7 @@ Semua endpoint di `controller/api/*` mengembalikan JSON.
 4. [x] Buat `view/pages/check-status.html` + mock status responses.
 5. [x] Buat `view/pages/admin-login.html` (form login).
 6. [x] Buat `view/pages/admin-dashboard.html` dengan komponen modular.
-7. [x] Komponen `view/components/dashboard-content.html` dengan data real.
+7. [x] Komponen `view/components/dashboard-content.html` dengan data real dan activity modal.
 8. [x] Responsiveness & accessibility check.
 
 ### Sprint API & DB (setelah UI siap)

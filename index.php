@@ -27,21 +27,21 @@ $action = $_GET['action'] ?? null;
 // Handle basic routing
 switch ($page) {
     case 'ticket':
-        include 'frontend/pages/ticket-form.html';
+        include 'view/pages/ticket-form.html';
         exit;
     case 'status':
-        include 'frontend/pages/check-status.html';
+        include 'view/pages/check-status.html';
         exit;
     case 'success':
-        include 'frontend/pages/success.html';
+        include 'view/pages/success.html';
         exit;
     case 'admin':
         if ($action === 'login') {
-            include 'frontend/pages/admin-login.html';
+            include 'view/pages/admin-login.html';
         } else {
             // Check if admin is logged in (basic session check)
             if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in']) {
-                include 'frontend/pages/admin-dashboard.html';
+                include 'view/pages/admin-dashboard.html';
             } else {
                 header('Location: ?page=admin&action=login');
             }

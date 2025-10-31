@@ -258,11 +258,11 @@ Semua endpoint di `controller/api/*` mengembalikan JSON.
 
 ### Sprint API & DB (setelah UI siap)
 
-9. [ ] Buat DB schema (`sql/schema.sql`) dan `model/Database.php`.
+9. [x] Buat DB schema (`sql/create-schema.sql`) dan `controller/config/database.php`.
 10. [ ] Implement `model/Ticket.php` untuk CRUD operations.
 11. [ ] Implement `controller/api/tickets.php` (simpan: tickets + files).
 12. [ ] Implement `controller/api/status.php` untuk cek status publik.
-13. [ ] Implement `model/Admin.php` dan `controller/api/auth.php`.
+13. [x] Implement `model/Admin.php` dan `controller/api/auth.php`.
 14. [ ] Implement ticket review di `controller/admin/ticket-review.php`.
 15. [ ] Implement `model/Template.php` dan template manager.
 16. [ ] Implement generate surat di `controller/helpers/docx-generator.php`.

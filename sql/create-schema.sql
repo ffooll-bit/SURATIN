@@ -2,8 +2,29 @@
 CREATE DATABASE IF NOT EXISTS suratin_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE suratin_db;
 
--- Drop table if exists
+-- Drop tables if exists
 DROP TABLE IF EXISTS tickets;
+DROP TABLE IF EXISTS admins;
+
+-- Create admins table
+CREATE TABLE admins (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(100) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    role ENUM('admin','super') DEFAULT 'admin',
+    active TINYINT(1) DEFAULT 1,
+    last_login DATETIME DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    -- Indexes
+    INDEX idx_username (username),
+    INDEX idx_email (email),
+    INDEX idx_role (role),
+    INDEX idx_active (active)
+) ENGINE=InnoDB;
 
 -- Create tickets table
 CREATE TABLE tickets (

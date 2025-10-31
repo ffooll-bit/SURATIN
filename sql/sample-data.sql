@@ -1,8 +1,17 @@
--- Sample data untuk tabel tickets
+-- Sample data untuk tabel tickets dan admins
 USE suratin_db;
 
 -- Clear existing data first (optional)
 -- DELETE FROM tickets;
+-- DELETE FROM admins;
+
+-- Insert sample admin data
+INSERT INTO admins (username, password_hash, name, email, role, active, last_login, created_at, updated_at) VALUES
+('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Administrator', 'admin@universitas.ac.id', 'admin', 1, '2024-10-31 08:00:00', '2024-10-01 00:00:00', '2024-10-31 08:00:00'),
+('super', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Super Administrator', 'super@universitas.ac.id', 'super', 1, '2024-10-31 07:30:00', '2024-10-01 00:00:00', '2024-10-31 07:30:00'),
+('baak_admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Admin BAAK', 'baak@universitas.ac.id', 'admin', 1, NULL, '2024-10-15 10:00:00', '2024-10-15 10:00:00'),
+('kemahasiswaan', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Admin Kemahasiswaan', 'kemahasiswaan@universitas.ac.id', 'admin', 1, '2024-10-30 16:45:00', '2024-10-20 09:00:00', '2024-10-30 16:45:00'),
+('hrd_admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Admin HRD', 'hrd@universitas.ac.id', 'admin', 0, NULL, '2024-10-25 14:30:00', '2024-10-25 14:30:00');
 
 -- Insert sample data
 INSERT INTO tickets (ticket_code, nama, npm, prodi, jenis_surat, data, attachments, email, wa, status, admin_note, created_at, updated_at) VALUES
@@ -72,7 +81,7 @@ INSERT INTO tickets (ticket_code, nama, npm, prodi, jenis_surat, data, attachmen
  '[{"name": "Transkrip_Lama.pdf", "path": "uploads/TCK-20241023-0007/Transkrip_Lama.pdf", "size": 567890}]',
  'nina.puspita@student.univ.ac.id', '08123450987', 'rejected', 'IPK belum memenuhi syarat minimum untuk surat rekomendasi program spesialis (min. 3.5). Silakan tingkatkan prestasi akademik terlebih dahulu.', '2024-10-23 10:30:00', '2024-10-23 14:15:00'),
 
--- Tickets dengan data yang lebih komplex
+-- Tickets dengan data yang lebih kompleks
 ('TCK-20241029-0016', 'Bayu Adi Pratama', '2023110199', 'Teknik Informatika', 'Surat Keterangan Aktif Kuliah', 
  '{"semester": "6", "tahun_akademik": "2024/2025", "keperluan": "Pendaftaran kompetisi programming internasional", "alamat": "Komplek Mahasiswa Blok A No. 15, Depok", "prestasi": ["Juara 1 Hackathon 2023", "Best Innovation Award 2024"]}',
  '[{"name": "KTM_Bayu.jpg", "path": "uploads/TCK-20241029-0016/KTM_Bayu.jpg", "size": 256789}, {"name": "Sertifikat_Juara.pdf", "path": "uploads/TCK-20241029-0016/Sertifikat_Juara.pdf", "size": 1234567}, {"name": "Portfolio_Project.pdf", "path": "uploads/TCK-20241029-0016/Portfolio_Project.pdf", "size": 5678901}]',

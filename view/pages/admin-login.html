@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - SURATIN</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="view/assets/bootstrap-5.3.8/css/bootstrap.min.css" rel="stylesheet">
+    <link href="view/assets/bootstrap-icons-1.13.1/bootstrap-icons.css" rel="stylesheet">
     <style>
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -144,7 +144,7 @@
 
                 <!-- Back to Public -->
                 <div class="text-center mt-3">
-                    <a href="ticket-form.html" class="text-white text-decoration-none">
+                    <a href="index.php" class="text-white text-decoration-none">
                         <i class="bi bi-arrow-left me-2"></i>Kembali ke Halaman Utama
                     </a>
                 </div>
@@ -167,24 +167,8 @@
     </div>
 
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="view/assets/bootstrap-5.3.8/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Mock user credentials
-        const mockUsers = {
-            admin: {
-                password: 'admin123',
-                name: 'Administrator',
-                role: 'admin',
-                email: 'admin@universitas.ac.id'
-            },
-            super: {
-                password: 'super123',
-                name: 'Super Administrator', 
-                role: 'super',
-                email: 'super@universitas.ac.id'
-            }
-        };
-
         // Toggle password visibility
         function togglePassword() {
             const passwordField = document.getElementById('password');
@@ -272,29 +256,40 @@
             return isValid;
         }
 
-        // Handle login
+        // Handle login - Updated to use API
         function handleLogin(username, password) {
             return new Promise((resolve, reject) => {
-                // Simulate API delay
-                setTimeout(() => {
-                    const user = mockUsers[username.toLowerCase()];
-                    
-                    if (user && user.password === password) {
-                        // Store user session (in real app, this would be handled by backend)
+                fetch('controller/api/auth.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Also store in localStorage for frontend use
                         const sessionData = {
-                            username: username.toLowerCase(),
-                            name: user.name,
-                            role: user.role,
-                            email: user.email,
+                            username: data.user.username,
+                            name: data.user.name,
+                            role: data.user.role,
+                            email: data.user.email,
                             loginTime: new Date().toISOString()
                         };
-                        
                         localStorage.setItem('adminSession', JSON.stringify(sessionData));
-                        resolve(sessionData);
+                        resolve(data.user);
                     } else {
-                        reject('Username atau password salah');
+                        reject(data.error || 'Login gagal');
                     }
-                }, 1500); // Simulate network delay
+                })
+                .catch(error => {
+                    console.error('Login error:', error);
+                    reject('Terjadi kesalahan saat login. Silakan coba lagi.');
+                });
             });
         }
 
@@ -326,7 +321,7 @@
                 
                 // Redirect to admin dashboard after short delay
                 setTimeout(() => {
-                    window.location.href = 'admin-dashboard.html';
+                    window.location.href = 'index.php?page=admin';
                 }, 2000);
                 
             } catch (error) {

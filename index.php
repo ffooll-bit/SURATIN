@@ -38,6 +38,11 @@ switch ($page) {
     case 'admin':
         if ($action === 'login') {
             include 'view/pages/admin-login.html';
+        } elseif ($action === 'logout') {
+            // Handle logout
+            session_unset();
+            session_destroy();
+            header('Location: ?page=home');
         } else {
             // Check if admin is logged in (basic session check)
             if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in']) {
@@ -62,11 +67,11 @@ switch ($page) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $config['app_name'] ?> - <?= $config['app_description'] ?></title>
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap CSS Local -->
+    <link href="view/assets/bootstrap-5.3.8/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Bootstrap Icons Local -->
+    <link href="view/assets/bootstrap-icons-1.13.1/bootstrap-icons.css" rel="stylesheet">
 
     <!-- Custom CSS -->
     <style>
@@ -355,8 +360,8 @@ switch ($page) {
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap JS Local -->
+    <script src="view/assets/bootstrap-5.3.8/js/bootstrap.bundle.min.js"></script>
 
     <!-- Custom JavaScript -->
     <script>

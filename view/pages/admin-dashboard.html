@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Admin - SURATIN</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="view/assets/bootstrap-5.3.8/css/bootstrap.min.css" rel="stylesheet">
+    <link href="view/assets/bootstrap-icons-1.13.1/bootstrap-icons.css" rel="stylesheet">
     <style>
         .sidebar {
             min-height: 100vh;
@@ -377,7 +377,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="view/assets/bootstrap-5.3.8/js/bootstrap.bundle.min.js"></script>
     <script>
         // Sample tickets data
         const sampleTickets = [
@@ -474,7 +474,7 @@
                 document.getElementById('adminRole').textContent = admin.role === 'super' ? 'Super Admin' : 'Admin';
             } else {
                 // Redirect to login if no session
-                window.location.href = 'admin-login.html';
+                window.location.href = 'index.php?page=admin&action=login';
             }
         }
 
@@ -572,8 +572,21 @@
 
         function logout() {
             if (confirm('Yakin ingin logout?')) {
+                // Clear localStorage
                 localStorage.removeItem('adminSession');
-                window.location.href = 'admin-login.html';
+                localStorage.removeItem('rememberAdmin');
+                
+                // Call logout API to clear server session
+                fetch('controller/api/auth.php', {
+                    method: 'DELETE'
+                })
+                .then(() => {
+                    window.location.href = 'index.php?page=admin&action=logout';
+                })
+                .catch(() => {
+                    // Fallback if API fails
+                    window.location.href = 'index.php?page=admin&action=logout';
+                });
             }
         }
 

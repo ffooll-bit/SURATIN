@@ -63,24 +63,58 @@ Tujuan: front-end berkomunikasi ke back-end lewat API JSON; admin login via sess
 ### Struktur file (saran)
 
 ```
-/project-root
-├─ frontend/                   # Frontend statis (HTML/CSS/JS) atau SPA
-│  ├─ public/                  # assets publik
-│  ├─ src/
-│  │  ├─ pages/                # ticket-form.html, check-status.html, admin-login.html (mock)
-│  │  └─ components/
-│  └─ build/                   # hasil build jika pakai bundler
-├─ backend/                    # PHP API & admin pages (server-side)
-│  ├─ api/                     # api/tickets.php, api/auth.php, api/templates.php, ...
-│  ├─ admin/                   # admin panel (protected pages) — bisa simple PHP + AJAX
-│  ├─ lib/                     # helper (db.php, mailer.php, docx_generator.php)
-│  └─ public/                  # index.php (gateway) atau gunakan virtual host
+/SURATIN
+├─ index.php                   # Landing page utama / gateway
+├─ view/                       # Frontend statis (HTML/CSS/JS)
+│  ├─ assets/                  # CSS, JS, images, fonts
+│  │  ├─ css/
+│  │  ├─ js/
+│  │  └─ img/
+│  ├─ ticket-form.html         # Form pengajuan ticket
+│  ├─ check-status.html        # Cek status ticket
+│  ├─ success.html             # Halaman sukses submit
+│  ├─ admin/                   # Halaman admin (protected)
+│  │  ├─ login.html            # Login admin
+│  │  ├─ dashboard.html        # Dashboard admin
+│  │  ├─ ticket-detail.html    # Detail ticket
+│  │  └─ template-manager.html # Kelola template
+│  └─ components/              # Komponen reusable (modals, etc)
+├─ controller/                 # PHP logika & API endpoints
+│  ├─ api/                     # REST API endpoints
+│  │  ├─ tickets.php           # CRUD tickets
+│  │  ├─ auth.php              # Login/logout admin
+│  │  ├─ templates.php         # Kelola template
+│  │  └─ status.php            # Cek status public
+│  ├─ admin/                   # Admin panel controllers
+│  │  ├─ dashboard.php         # Logic dashboard
+│  │  ├─ ticket-review.php     # Review & approve ticket
+│  │  └─ template-upload.php   # Upload & manage templates
+│  ├─ helpers/                 # Helper functions
+│  │  ├─ mailer.php            # Email sender
+│  │  ├─ docx-generator.php    # Generate dokumen
+│  │  ├─ whatsapp.php          # WA integration
+│  │  └─ utils.php             # General utilities
+│  └─ config/                  # Konfigurasi
+│     ├─ database.php          # DB connection
+│     └─ app.php               # App settings
+├─ model/                      # PHP untuk database & data layer
+│  ├─ Ticket.php               # Model ticket operations
+│  ├─ Admin.php                # Model admin/user
+│  ├─ Template.php             # Model template dokumen
+│  ├─ Letter.php               # Model surat yang dihasilkan
+│  └─ Database.php             # Base database class
+├─ uploads/                    # File uploads (lampiran)
+│  └─ tickets/                 # Organized by ticket_code
+├─ storage/                    # Generated files
+│  ├─ letters/                 # Surat yang dihasilkan (.docx/.pdf)
+│  ├─ templates/               # Template .docx
+│  └─ qrcodes/                 # QR code images
 ├─ sql/
-│  └─ schema.sql
+│  └─ schema.sql               # Database schema
 └─ README.md
 ```
 
-> Catatan: front-end dapat di-develop terpisah (mis. di `frontend/`) lalu Copilot dapat generate komponen HTML/CSS/JS tanpa perlu PHP. Frontend akan memanggil endpoint di `backend/api/*`.
+> Catatan: `index.php` sebagai entry point yang bisa routing ke halaman yang tepat. File di `view/` adalah HTML statis yang berkomunikasi dengan `controller/api/` melalui AJAX/fetch.
 
 ## Phase D — Skema Database (MySQL)
 
@@ -143,23 +177,23 @@ CREATE TABLE letters (
 
 ## Phase E — API Contract (endpoints penting)
 
-Semua `api/*` mengembalikan JSON.
+Semua endpoint di `controller/api/*` mengembalikan JSON.
 
 ### Publik (no auth)
 
-* `POST /api/tickets` — submit ticket (payload form / multipart for files) → returns `{ticket_code, status}`
-* `GET /api/tickets/status?ticket_code=...&email=...` — cek status
+* `POST /controller/api/tickets.php` — submit ticket (payload form / multipart for files) → returns `{ticket_code, status}`
+* `GET /controller/api/status.php?ticket_code=...&email=...` — cek status
 
 ### Admin (session auth or token)
 
-* `POST /api/auth/login` — login admin → sets session
-* `GET /api/tickets` — list tickets (params filter)
-* `GET /api/tickets/{id}` — detail ticket
-* `POST /api/tickets/{id}/validate` — mark valid (body: template_id, optional edits)
-* `POST /api/tickets/{id}/reject` — mark reject (body: reason)
-* `POST /api/tickets/{id}/generate` — force generate surat (backend will produce file, update `letters`)
-* `GET /api/templates` — list templates
-* `POST /api/templates` — upload template
+* `POST /controller/api/auth.php` — login admin → sets session
+* `GET /controller/api/tickets.php` — list tickets (params filter)
+* `GET /controller/api/tickets.php?id={id}` — detail ticket
+* `POST /controller/api/tickets.php` dengan action=validate — mark valid (body: template_id, optional edits)
+* `POST /controller/api/tickets.php` dengan action=reject — mark reject (body: reason)
+* `POST /controller/api/tickets.php` dengan action=generate — force generate surat
+* `GET /controller/api/templates.php` — list templates
+* `POST /controller/api/templates.php` — upload template
 
 ## Phase F — Fungsional Back-End (logika)
 
@@ -213,43 +247,45 @@ Semua `api/*` mengembalikan JSON.
 
 ### Sprint UI (tahap awal)
 
-1. [x] Buat halaman `ticket-form.html` (static) — form lengkap + client validation.
-2. [x] Buat `success.html` dengan menampilkan ticket_code (mock).
-3. [x] Buat `check-status.html` + mock status responses.
-4. [x] Buat admin login page (form).
-5. [x] Buat admin dashboard static (tabel sample tickets).
-6. [x] Komponen modal, toast, file upload.
-7. [x] Responsiveness & accessibility check.
+1. [x] Buat `index.php` sebagai landing page dengan routing sederhana.
+2. [x] Buat halaman `view/ticket-form.html` (static) — form lengkap + client validation.
+3. [x] Buat `view/success.html` dengan menampilkan ticket_code (mock).
+4. [x] Buat `view/check-status.html` + mock status responses.
+5. [x] Buat `view/admin/login.html` (form login).
+6. [x] Buat `view/admin/dashboard.html` static (tabel sample tickets).
+7. [x] Komponen modal, toast, file upload di `view/components/`.
+8. [x] Responsiveness & accessibility check.
 
 ### Sprint API & DB (setelah UI siap)
 
-8. [ ] Buat DB schema (`sql/schema.sql`) dan helper `backend/lib/db.php`.
-9. [ ] Implement `POST /api/tickets` (simpan: tickets + files).
-10. [ ] Implement `GET /api/tickets` (list, filters).
-11. [ ] Implement admin auth & session.
-12. [ ] Implement ticket review endpoints (validate/reject).
-13. [ ] Integrasi template manager & upload.
-14. [ ] Implement generate surat (phpword + numbering update).
-15. [ ] Implement notifikasi worker (email + WA adapter stub).
-16. [ ] Add logging (file + DB event logs).
+9. [ ] Buat DB schema (`sql/schema.sql`) dan `model/Database.php`.
+10. [ ] Implement `model/Ticket.php` untuk CRUD operations.
+11. [ ] Implement `controller/api/tickets.php` (simpan: tickets + files).
+12. [ ] Implement `controller/api/status.php` untuk cek status publik.
+13. [ ] Implement `model/Admin.php` dan `controller/api/auth.php`.
+14. [ ] Implement ticket review di `controller/admin/ticket-review.php`.
+15. [ ] Implement `model/Template.php` dan template manager.
+16. [ ] Implement generate surat di `controller/helpers/docx-generator.php`.
+17. [ ] Implement notifikasi di `controller/helpers/mailer.php` dan `whatsapp.php`.
+18. [ ] Add logging dan error handling.
 
 ### Sprint finishing
 
-17. [ ] Tests: unit + integration for full flow.
-18. [ ] Security audit: file upload, auth, SQL injection, XSS.
-19. [ ] Prepare docs: how-to-run, env vars (SMTP, WA creds), endpoints list.
-20. [ ] Optional: add QR verification public page (verifikasi nomor surat).
+19. [ ] Tests: unit + integration for full flow.
+20. [ ] Security audit: file upload, auth, SQL injection, XSS.
+21. [ ] Prepare docs: how-to-run, env vars (SMTP, WA creds), endpoints list.
+22. [ ] Optional: add QR verification public page (verifikasi nomor surat).
 
 ## Petunjuk implementasi cepat (snippet & tips)
 
-* **Ticket code**: `TCK-YYYYMMDD-<4digit>` generated di server.
-* **Replace placeholders** (contoh phpword pseudo):
+* **Ticket code**: `TCK-YYYYMMDD-<4digit>` generated di `model/Ticket.php`.
+* **Replace placeholders** (contoh phpword di `controller/helpers/docx-generator.php`):
   ```php
   $templateProcessor->setValue('{nama_mahasiswa}', $data['nama']);
   ```
-* **Generate nomor**: salin logic `last_number_mode` dari README (skip vs offset).
-* **Notifikasi email**: gunakan PHPMailer, jangan hardcode creds; gunakan ENV.
-* **WA integration**: buat adapter interface `WaSenderInterface` dan implementasi stub lokal dulu (log → true). Nanti ganti ke provider.
+* **Generate nomor**: salin logic `last_number_mode` dari README (skip vs offset) di `model/Template.php`.
+* **Notifikasi email**: gunakan PHPMailer di `controller/helpers/mailer.php`, jangan hardcode creds; gunakan ENV.
+* **WA integration**: buat adapter interface di `controller/helpers/whatsapp.php` dan implementasi stub lokal dulu.
 
 ## Catatan penting / rekomendasi
 

@@ -1,9 +1,12 @@
+<?php
+require_once __DIR__ . '/../../controller/config/app.php';
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login - SURATIN</title>
+    <title>Admin Login - <?= APP_NAME; ?></title>
     <link href="view/assets/bootstrap-5.3.8/css/bootstrap.min.css" rel="stylesheet">
     <link href="view/assets/bootstrap-icons-1.13.1/bootstrap-icons.css" rel="stylesheet">
     <style>
@@ -75,7 +78,7 @@
                         <div class="brand-logo">
                             <i class="bi bi-shield-lock"></i>
                         </div>
-                        <h3 class="mb-2">SURATIN</h3>
+                        <h3 class="mb-2"><?= APP_NAME; ?></h3>
                         <p class="mb-0">Admin Panel</p>
                     </div>
 
@@ -146,7 +149,13 @@
                     <!-- Footer -->
                     <div class="login-footer">
                         <small class="text-muted">
-                            © 2024 SURATIN. Sistem Urus Surat Terintegrasi
+                            © <?= date('Y'); ?> <?= APP_NAME; ?>. <?= APP_DESCRIPTION; ?>
+                            <?php if (defined('APP_DEV') && APP_DEV): ?>
+                                <br><span class="text-muted">Developed by <?= APP_DEV; ?></span>
+                            <?php endif; ?>
+                            <?php if (DEBUG_MODE): ?>
+                                <br><span class="badge bg-warning text-dark">Development Mode</span>
+                            <?php endif; ?>
                         </small>
                     </div>
                 </div>
@@ -178,6 +187,16 @@
     <!-- Scripts -->
     <script src="view/assets/bootstrap-5.3.8/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Configuration from PHP
+        const APP_CONFIG = {
+            name: '<?= APP_NAME; ?>',
+            description: '<?= APP_DESCRIPTION; ?>',
+            version: '<?= APP_VERSION; ?>',
+            dev: '<?= APP_DEV; ?>',
+            debugMode: <?= DEBUG_MODE ? 'true' : 'false'; ?>,
+            sessionLifetime: <?= SESSION_LIFETIME; ?>
+        };
+
         // Toggle password visibility
         function togglePassword() {
             const passwordField = document.getElementById('password');
@@ -287,7 +306,8 @@
                             name: data.user.name,
                             role: data.user.role,
                             email: data.user.email,
-                            loginTime: new Date().toISOString()
+                            loginTime: new Date().toISOString(),
+                            sessionLifetime: APP_CONFIG.sessionLifetime
                         };
                         localStorage.setItem('adminSession', JSON.stringify(sessionData));
                         resolve(data.user);
@@ -351,6 +371,12 @@
                 // Focus on username field
                 document.getElementById('username').focus();
             }
+
+            // Debug info if in development mode
+            if (APP_CONFIG.debugMode) {
+                console.log('App Config:', APP_CONFIG);
+                console.log('Session Lifetime:', APP_CONFIG.sessionLifetime, 'seconds');
+            }
         });
 
         // Handle Enter key in password field
@@ -359,6 +385,30 @@
                 document.getElementById('loginForm').dispatchEvent(new Event('submit'));
             }
         });
+
+        // Session timeout warning (using configuration)
+        function checkSessionTimeout() {
+            const adminSession = localStorage.getItem('adminSession');
+            if (adminSession) {
+                try {
+                    const session = JSON.parse(adminSession);
+                    const loginTime = new Date(session.loginTime);
+                    const now = new Date();
+                    const sessionDuration = (now - loginTime) / 1000; // in seconds
+                    const sessionLifetime = session.sessionLifetime || APP_CONFIG.sessionLifetime;
+                    
+                    // Warn when 90% of session time has passed
+                    if (sessionDuration > sessionLifetime * 0.9) {
+                        showToast('Sesi akan berakhir dalam ' + Math.round((sessionLifetime - sessionDuration) / 60) + ' menit', 'warning');
+                    }
+                } catch (e) {
+                    console.error('Error parsing session data:', e);
+                }
+            }
+        }
+
+        // Check session timeout every 5 minutes
+        setInterval(checkSessionTimeout, 5 * 60 * 1000);
     </script>
 </body>
 </html>

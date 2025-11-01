@@ -1,9 +1,19 @@
+<?php
+require_once __DIR__ . '/../../controller/config/app.php';
+
+// Simple session check (in real app, this would be more robust)
+if (!isset($_SESSION['admin_logged_in'])) {
+    header('Location: index.php?page=admin&action=login');
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin - SURATIN</title>
+    <title>Dashboard Admin - <?= APP_NAME; ?></title>
+    <meta name="description" content="Dashboard admin untuk mengelola sistem <?= APP_NAME; ?>">
     <link href="view/assets/bootstrap-5.3.8/css/bootstrap.min.css" rel="stylesheet">
     <link href="view/assets/bootstrap-icons-1.13.1/bootstrap-icons.css" rel="stylesheet">
     <style>
@@ -148,7 +158,7 @@
         <div class="p-4">
             <h4 class="text-white mb-0">
                 <i class="bi bi-shield-check me-2" aria-hidden="true"></i>
-                SURATIN
+                <?= APP_NAME; ?>
             </h4>
             <small class="text-white-50">Admin Panel</small>
         </div>

@@ -14,15 +14,6 @@ require_once __DIR__ . '/controller/config/app.php';
 // Start session
 session_start();
 
-// Basic configuration using constants from app.php
-$config = [
-    'app_name' => APP_NAME,
-    'app_description' => APP_DESCRIPTION,
-    'version' => APP_VERSION,
-    'base_url' => '/SURATIN',
-    'admin_path' => '/admin',
-];
-
 // Simple routing
 $page = $_GET['page'] ?? 'home';
 $action = $_GET['action'] ?? null;
@@ -30,17 +21,17 @@ $action = $_GET['action'] ?? null;
 // Handle basic routing
 switch ($page) {
     case 'ticket':
-        include 'view/pages/ticket-form.html';
+        include 'view/pages/ticket-form.php';
         exit;
     case 'status':
-        include 'view/pages/check-status.html';
+        include 'view/pages/check-status.php';
         exit;
     case 'success':
-        include 'view/pages/success.html';
+        include 'view/pages/success.php';
         exit;
     case 'admin':
         if ($action === 'login') {
-            include 'view/pages/admin-login.html';
+            include 'view/pages/admin-login.php';
         } elseif ($action === 'logout') {
             // Handle logout
             session_unset();
@@ -49,7 +40,7 @@ switch ($page) {
         } else {
             // Check if admin is logged in (basic session check)
             if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in']) {
-                include 'view/pages/admin-dashboard.html';
+                include 'view/pages/admin-dashboard.php';
             } else {
                 header('Location: ?page=admin&action=login');
             }

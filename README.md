@@ -80,11 +80,11 @@ File `controller/config/app.php` berisi:
 │  │  ├─ js/
 │  │  └─ img/
 │  ├─ pages/                   # Halaman utama
-│  │  ├─ ticket-form.html      # Form pengajuan ticket
-│  │  ├─ check-status.html     # Cek status ticket
-│  │  ├─ success.html          # Halaman sukses submit
-│  │  ├─ admin-login.html      # Login admin
-│  │  └─ admin-dashboard.html  # Dashboard admin
+│  │  ├─ ticket-form.php       # Form pengajuan ticket (menggunakan konfigurasi app.php)
+│  │  ├─ check-status.php      # Cek status ticket (menggunakan konfigurasi app.php)
+│  │  ├─ success.php           # Halaman sukses submit (menggunakan konfigurasi app.php)
+│  │  ├─ admin-login.php       # Login admin (menggunakan konfigurasi app.php)
+│  │  └─ admin-dashboard.php   # Dashboard admin (menggunakan konfigurasi app.php)
 │  └─ components/              # Komponen reusable (modals, etc)
 ├─ controller/                 # PHP logika & API endpoints
 │  ├─ api/                     # REST API endpoints
@@ -103,7 +103,56 @@ File `controller/config/app.php` berisi:
 └─ sql/                        # Database scripts
 ```
 
-> Catatan: `index.php` sebagai entry point yang bisa routing ke halaman yang tepat. File di `view/` adalah HTML statis yang berkomunikasi dengan `controller/api/` melalui AJAX/fetch.
+> Catatan: `index.php` sebagai entry point yang bisa routing ke halaman yang tepat. File di `view/pages/` menggunakan konfigurasi dari `controller/config/app.php` untuk konsistensi data aplikasi.
+
+## Konfigurasi Aplikasi
+
+### Central Configuration (`controller/config/app.php`)
+
+Aplikasi SURATIN menggunakan sistem konfigurasi terpusat yang memungkinkan pengelolaan yang konsisten di seluruh aplikasi:
+
+```php
+// Pengaturan Aplikasi
+define('APP_NAME', 'SURATIN');
+define('APP_DESCRIPTION', 'Sistem Urus Surat Terintegrasi');
+define('APP_VERSION', '1.0.0');
+define('APP_DEV', 'FFOOLL-BIT');
+define('APP_ENV', 'development'); // development, staging, production
+
+// Pengaturan Timezone
+define('APP_TIMEZONE', 'Asia/Makassar');
+define('DATE_FORMAT', 'Y-m-d H:i:s');
+define('DISPLAY_DATE_FORMAT', 'd/m/Y H:i');
+
+// Pengaturan Session
+define('SESSION_LIFETIME', 3600 * 8); // 8 jam dalam detik
+
+// Mode Debug (otomatis berdasarkan environment)
+define('DEBUG_MODE', APP_ENV === 'development');
+```
+
+### Integrasi dengan Pages
+
+Semua file di `view/pages/` telah dikonversi menjadi PHP untuk menggunakan konfigurasi ini:
+
+- **Dynamic Title**: `<?= APP_NAME; ?>` - Nama aplikasi konsisten
+- **Meta Description**: Menggunakan `APP_DESCRIPTION` untuk SEO
+- **Footer Information**: Menampilkan developer (`APP_DEV`) dan tahun otomatis
+- **Debug Mode**: Indikator visual saat dalam mode development
+- **Version Display**: Menampilkan versi aplikasi di area admin
+- **JavaScript Config**: Konfigurasi tersedia di frontend melalui `APP_CONFIG`
+
+### Environment-based Features
+
+- **Development Mode**: 
+  - Debug indicator di pojok kanan atas
+  - Console logging yang lebih verbose
+  - Mock data yang lebih lengkap
+  
+- **Production Mode**:
+  - Debug features dinonaktifkan
+  - Error reporting dikurangi
+  - Performance optimizations
 
 ## Phase D — Skema Database (MySQL)
 
@@ -237,11 +286,11 @@ Semua endpoint di `controller/api/*` mengembalikan JSON.
 ### Sprint UI (tahap awal)
 
 1. [x] Buat `index.php` sebagai landing page dengan routing sederhana.
-2. [x] Buat halaman `view/pages/ticket-form.html` (static) — form lengkap + client validation.
-3. [x] Buat `view/pages/success.html` dengan menampilkan ticket_code (mock).
-4. [x] Buat `view/pages/check-status.html` + mock status responses.
-5. [x] Buat `view/pages/admin-login.html` (form login).
-6. [x] Buat `view/pages/admin-dashboard.html` dengan komponen modular.
+2. [x] Buat halaman `view/pages/ticket-form.php` (menggunakan konfigurasi dari app.php).
+3. [x] Buat `view/pages/success.php` (menggunakan konfigurasi dari app.php).
+4. [x] Buat `view/pages/check-status.php` (menggunakan konfigurasi dari app.php).
+5. [x] Buat `view/pages/admin-login.php` (menggunakan konfigurasi dari app.php).
+6. [x] Buat `view/pages/admin-dashboard.php` (menggunakan konfigurasi dari app.php).
 7. [x] Komponen `view/components/dashboard-content.html` dengan data real dan activity modal.
 8. [x] Responsiveness & accessibility check.
 

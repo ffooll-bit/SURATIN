@@ -1,10 +1,13 @@
+<?php
+require_once __DIR__ . '/../../controller/config/app.php';
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Pengajuan Surat - SURATIN</title>
-    <meta name="description" content="Form pengajuan surat online untuk berbagai keperluan akademik dan administrasi melalui sistem SURATIN">
+    <title>Form Pengajuan Surat - <?= APP_NAME; ?></title>
+    <meta name="description" content="Form pengajuan surat online untuk berbagai keperluan akademik dan administrasi melalui sistem <?= APP_NAME; ?>">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <style>
@@ -90,9 +93,28 @@
             outline: 2px solid #0d6efd;
             outline-offset: 2px;
         }
+        
+        /* Environment indicator */
+        <?php if (DEBUG_MODE): ?>
+        .debug-info {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1050;
+            font-size: 0.75rem;
+        }
+        <?php endif; ?>
     </style>
 </head>
 <body class="bg-light">
+    <?php if (DEBUG_MODE): ?>
+    <div class="debug-info">
+        <span class="badge bg-warning text-dark">
+            <i class="bi bi-bug me-1"></i>Debug Mode - <?= APP_VERSION; ?>
+        </span>
+    </div>
+    <?php endif; ?>
+    
     <!-- Skip to main content link -->
     <a href="#main-form" class="visually-hidden-focusable">Skip to main form</a>
     
@@ -101,9 +123,14 @@
         <div class="container">
             <div class="row justify-content-center text-center">
                 <div class="col-lg-8">
-                    <h1 class="display-5 fw-bold mb-3">SURATIN</h1>
-                    <p class="lead mb-0">Sistem Urus Surat Terintegrasi</p>
+                    <h1 class="display-5 fw-bold mb-3"><?= APP_NAME; ?></h1>
+                    <p class="lead mb-0"><?= APP_DESCRIPTION; ?></p>
                     <p class="mb-0">Ajukan permohonan surat dengan mudah dan cepat</p>
+                    <?php if (defined('APP_DEV') && APP_DEV): ?>
+                    <small class="d-block mt-2 opacity-75">
+                        Dikembangkan oleh <?= APP_DEV; ?>
+                    </small>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -214,10 +241,26 @@
                             </small>
                         </div>
                     </form>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-3">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <small>
+                        © <?= date('Y'); ?> <?= APP_NAME; ?>. <?= APP_DESCRIPTION; ?>
+                        <?php if (defined('APP_DEV') && APP_DEV): ?>
+                            <br>Developed by <?= APP_DEV; ?>
+                        <?php endif; ?>
+                    </small>
                 </div>
             </div>
         </div>
-    </div>
+    </footer>
 
     <!-- Confirmation Modal -->
     <div class="modal fade" id="confirmationModal" tabindex="-1">
@@ -246,6 +289,16 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Configuration from PHP
+        const APP_CONFIG = {
+            name: '<?= APP_NAME; ?>',
+            description: '<?= APP_DESCRIPTION; ?>',
+            version: '<?= APP_VERSION; ?>',
+            dev: '<?= APP_DEV; ?>',
+            debugMode: <?= DEBUG_MODE ? 'true' : 'false'; ?>,
+            sessionLifetime: <?= SESSION_LIFETIME; ?>
+        };
+
         // Global variables
         let selectedFiles = [];
         const maxFileSize = 5 * 1024 * 1024; // 5MB
@@ -469,7 +522,12 @@
             document.getElementById('confirmSubmit').addEventListener('click', function() {
                 // Here you would normally submit to the API
                 // For now, we'll show a success message
-                alert('Pengajuan berhasil dikirim! Nomor tiket: TCK-20241029-0001\n\nAnda akan menerima notifikasi melalui email dan WhatsApp.');
+                const ticketNumber = 'TCK-' + new Date().getFullYear() + 
+                                   String(new Date().getMonth() + 1).padStart(2, '0') + 
+                                   String(new Date().getDate()).padStart(2, '0') + '-' + 
+                                   String(Math.floor(Math.random() * 9999) + 1).padStart(4, '0');
+                                   
+                alert(`Pengajuan berhasil dikirim!\n\nNomor tiket: ${ticketNumber}\n\nAnda akan menerima notifikasi melalui email dan WhatsApp.`);
                 
                 // Reset form
                 document.getElementById('ticketForm').reset();
@@ -479,7 +537,18 @@
                 document.getElementById('ticketForm').classList.remove('was-validated');
                 
                 bootstrap.Modal.getInstance(document.getElementById('confirmationModal')).hide();
+                
+                // Redirect to success page after a moment
+                setTimeout(() => {
+                    window.location.href = 'index.php?page=success&ticket=' + ticketNumber;
+                }, 2000);
             });
+
+            // Debug info if in development mode
+            if (APP_CONFIG.debugMode) {
+                console.log('App Config:', APP_CONFIG);
+                console.log(`${APP_CONFIG.name} v${APP_CONFIG.version} - Form ready`);
+            }
         });
     </script>
 </body>

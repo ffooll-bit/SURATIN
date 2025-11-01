@@ -58,8 +58,8 @@ function createActivityModal() {
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <div class="d-flex gap-2">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                            <div class="d-flex flex-wrap gap-2">
                                 <select class="form-select form-select-sm" id="activityStatusFilter" style="width: auto;">
                                     <option value="">All Status</option>
                                     <option value="submitted">Submitted</option>

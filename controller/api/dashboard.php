@@ -120,20 +120,17 @@ try {
                         'rejected' => 0
                     ];
                     
-                    // Count new tickets created today
-                    $newToday = $ticketModel->getAll(['date_from' => $today, 'date_to' => $today], 1, 1000);
-                    $summary['new_tickets'] = count($newToday['data']);
-                    
                     // Get tickets updated today (status changes)
                     $stmt = $ticketModel->pdo->prepare("
                         SELECT status, COUNT(*) as count 
                         FROM tickets 
-                        WHERE DATE(updated_at) = ? AND DATE(created_at) != DATE(updated_at)
+                        WHERE DATE(updated_at) = ?
                         GROUP BY status
                     ");
                     $stmt->execute([$today]);
                     $updatedToday = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
                     
+                    $summary['new_tickets'] = $updatedToday['submitted'] ?? 0;
                     $summary['approved'] = $updatedToday['valid'] ?? 0;
                     $summary['generated'] = $updatedToday['generated'] ?? 0;
                     $summary['rejected'] = $updatedToday['rejected'] ?? 0;

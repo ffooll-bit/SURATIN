@@ -7,17 +7,24 @@
 // Include app configuration
 require_once __DIR__ . '/app.php';
 
+// Database configuration constants
+define('DB_HOST', 'localhost');
+define('DB_USERNAME', 'root');
+define('DB_PASSWORD', '');
+define('DB_DATABASE', 'suratin_db');
+define('DB_CHARSET', 'utf8mb4');
+
 class Database {
     private static $instance = null;
     private $pdo = null;
     
-    // Database configuration
+    // Database configuration using constants
     private $config = [
-        'host' => 'localhost',
-        'username' => 'root',
-        'password' => '',
-        'database' => 'suratin_db',
-        'charset' => 'utf8mb4',
+        'host' => DB_HOST,
+        'username' => DB_USERNAME,
+        'password' => DB_PASSWORD,
+        'database' => DB_DATABASE,
+        'charset' => DB_CHARSET,
         'options' => [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,

@@ -8,14 +8,17 @@
  * @version 1.0
  */
 
+// Include app configuration
+require_once __DIR__ . '/controller/config/app.php';
+
 // Start session
 session_start();
 
-// Basic configuration
+// Basic configuration using constants from app.php
 $config = [
-    'app_name' => 'SURATIN',
-    'app_description' => 'Sistem Urus Surat Terintegrasi',
-    'version' => '1.0.0',
+    'app_name' => APP_NAME,
+    'app_description' => APP_DESCRIPTION,
+    'version' => APP_VERSION,
     'base_url' => '/SURATIN',
     'admin_path' => '/admin',
 ];
@@ -65,7 +68,7 @@ switch ($page) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $config['app_name'] ?> - <?= $config['app_description'] ?></title>
+    <title><?= APP_NAME ?> - <?= APP_DESCRIPTION ?></title>
 
     <!-- Bootstrap CSS Local -->
     <link href="view/assets/bootstrap-5.3.8/css/bootstrap.min.css" rel="stylesheet">
@@ -174,7 +177,7 @@ switch ($page) {
         <div class="container">
             <a class="navbar-brand fw-bold fs-4" href="?page=home">
                 <i class="bi bi-envelope-check me-2"></i>
-                <?= $config['app_name'] ?>
+                <?= APP_NAME ?>
             </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -206,7 +209,7 @@ switch ($page) {
             <div class="row align-items-center">
                 <div class="col-lg-6">
                     <h1 class="display-4 fw-bold mb-4">
-                        Sistem Urus Surat Terintegrasi
+                        <?= APP_DESCRIPTION ?>
                     </h1>
                     <p class="lead mb-4">
                         Platform digital yang memudahkan proses pengurusan surat-menyurat secara online.
@@ -332,13 +335,13 @@ switch ($page) {
                 <div class="col-lg-6">
                     <h5 class="fw-bold mb-3">
                         <i class="bi bi-envelope-check me-2"></i>
-                        <?= $config['app_name'] ?>
+                        <?= APP_NAME ?>
                     </h5>
                     <p class="mb-3">
-                        Sistem Urus Surat Terintegrasi yang memudahkan proses administrasi digital.
+                        <?= APP_DESCRIPTION ?>
                     </p>
                     <p class="small">
-                        Version <?= $config['version'] ?> &copy; <?= date('Y') ?> SURATIN Team
+                        Version <?= APP_VERSION ?> &copy; <?= date('Y') ?> <?= APP_DEV ?>
                     </p>
                 </div>
                 <div class="col-lg-3">
@@ -367,7 +370,7 @@ switch ($page) {
     <script>
         // Simple page tracking
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('<?= $config['app_name'] ?> v<?= $config['version'] ?> - Landing Page Loaded');
+            console.log('<?= APP_NAME ?> v<?= APP_VERSION ?> - Landing Page Loaded');
 
             // Add smooth scrolling to anchor links
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {

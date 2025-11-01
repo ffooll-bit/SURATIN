@@ -6,13 +6,8 @@
  * Usage: php run-schema.php
  */
 
-// Database configuration
-$config = [
-    'host' => 'localhost',
-    'username' => 'root',
-    'password' => '',
-    'database' => 'suratin_db'
-];
+// Include database configuration
+require_once __DIR__ . '/controller/config/database.php';
 
 echo "SURATIN Schema Runner\n";
 echo "====================\n\n";
@@ -34,8 +29,8 @@ try {
     
     // Connect to MySQL (without database first) with buffered queries
     echo "Connecting to MySQL server...\n";
-    $pdo = new PDO("mysql:host={$config['host']}", 
-                   $config['username'], $config['password'], [
+    $pdo = new PDO("mysql:host=" . DB_HOST, 
+                   DB_USERNAME, DB_PASSWORD, [
                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                        PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true
                    ]);
@@ -65,8 +60,8 @@ try {
     // Verify database and tables with new connection
     echo "\nVerifying database structure...\n";
     $pdo = null;
-    $pdo = new PDO("mysql:host={$config['host']};dbname={$config['database']}", 
-                   $config['username'], $config['password'], [
+    $pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_DATABASE, 
+                   DB_USERNAME, DB_PASSWORD, [
                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                        PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true
                    ]);

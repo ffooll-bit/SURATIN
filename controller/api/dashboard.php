@@ -218,6 +218,7 @@ try {
 
 /**
  * Helper function to calculate time ago using app timezone
+ * Uses the getTimeAgo() function from app.php
  */
 function timeAgo($datetime) {
     return getTimeAgo($datetime);

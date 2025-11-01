@@ -13,6 +13,20 @@ echo "SURATIN Sample Data Runner\n";
 echo "==========================\n\n";
 
 try {
+    // Read SQL file
+    $sqlFile = 'sql/sample-data.sql';
+    
+    if (!file_exists($sqlFile)) {
+        throw new Exception("File $sqlFile tidak ditemukan!");
+    }
+
+    echo "Reading SQL file: $sqlFile\n";
+    $sql = file_get_contents($sqlFile);
+
+    if (empty($sql)) {
+        throw new Exception("File SQL kosong atau tidak dapat dibaca!");
+    }
+
     // Check if database exists with buffered queries enabled
     echo "Checking database connection...\n";
     $pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_DATABASE, 
@@ -20,20 +34,6 @@ try {
                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                        PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true
                    ]);
-    
-    // Read SQL file
-    $sqlFile = 'sql/sample-data.sql';
-    
-    if (!file_exists($sqlFile)) {
-        throw new Exception("File $sqlFile tidak ditemukan!");
-    }
-    
-    echo "Reading SQL file: $sqlFile\n";
-    $sql = file_get_contents($sqlFile);
-    
-    if (empty($sql)) {
-        throw new Exception("File SQL kosong atau tidak dapat dibaca!");
-    }
     
     // Check if tables exist
     $stmt = $pdo->query("SHOW TABLES LIKE 'tickets'");
@@ -116,8 +116,8 @@ try {
     
     // Check final record count with new connection to avoid buffering issues
     $pdo = null;
-    $pdo = new PDO("mysql:host={$config['host']};dbname={$config['database']}", 
-                   $config['username'], $config['password'], [
+    $pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_DATABASE, 
+                   DB_USERNAME, DB_PASSWORD, [
                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                        PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true
                    ]);

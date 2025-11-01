@@ -393,6 +393,11 @@ function animateCounter(elementId, targetValue) {
             clearInterval(timer);
         }
     }, stepTime);
+    
+    // Register this interval for cleanup
+    if (typeof registerInterval === 'function') {
+        registerInterval(timer);
+    }
 }
 
 function showStatsError() {
@@ -546,16 +551,56 @@ function showRecentActivityError(message) {
 }
 
 // Global initialization function for dashboard
-window.initializeDashboard = function() {
-    // Remove the recursive call and directly call the functions
+function initializeDashboard() {
     console.log('Initializing dashboard...');
+    
+    // Register this function for cleanup
+    if (typeof registerGlobalFunction === 'function') {
+        registerGlobalFunction('initializeDashboard');
+        registerGlobalFunction('loadDashboardStats');
+        registerGlobalFunction('reviewPendingTickets');
+        registerGlobalFunction('generateReports');
+        registerGlobalFunction('manageTemplates');
+        registerGlobalFunction('systemSettings');
+        registerGlobalFunction('viewAllActivity');
+        registerGlobalFunction('showActivityModal');
+        registerGlobalFunction('loadAllActivity');
+        registerGlobalFunction('exportActivityData');
+    }
+    
     if (document.getElementById('dashboard-content')) {
         loadDashboardStats();
         
-        // Auto refresh every 30 seconds
-        setInterval(() => {
+        // Auto refresh every 30 seconds - register the interval for cleanup
+        const refreshInterval = setInterval(() => {
             console.log('Auto-refreshing dashboard...');
-            loadDashboardStats();
+            if (document.getElementById('dashboard-content')) {
+                loadDashboardStats();
+            }
         }, 30000);
+        
+        // Register interval for cleanup
+        if (typeof registerInterval === 'function') {
+            registerInterval(refreshInterval);
+        }
     }
+}
+
+// Cleanup function for dashboard section
+function cleanupDashboard() {
+    console.log('Cleaning up dashboard resources...');
+    
+    // Close any open modals
+    const activityModal = document.getElementById('activityModal');
+    if (activityModal) {
+        const bsModal = bootstrap.Modal.getInstance(activityModal);
+        if (bsModal) {
+            bsModal.hide();
+        }
+        // Remove modal from DOM
+        activityModal.remove();
+    }
+    
+    // Clear any pending fetch requests (if we had a way to track them)
+    // This would require implementing an AbortController system
 };

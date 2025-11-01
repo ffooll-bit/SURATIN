@@ -61,7 +61,7 @@ function createActivityModal() {
                         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
                             <div class="d-flex flex-wrap gap-2">
                                 <select class="form-select form-select-sm" id="activityStatusFilter" style="width: auto;">
-                                    <option value="">All Status</option>
+                                    <option value="">Tampilkan Semua Status</option>
                                     <option value="submitted">Submitted</option>
                                     <option value="in_review">In Review</option>
                                     <option value="valid">Valid</option>

@@ -133,58 +133,18 @@ async function loadTicketsData() {
         }
     } catch (error) {
         console.error('Error loading tickets:', error);
-        // Show fallback data for demonstration
-        loadFallbackData();
+        // Show error message instead of fallback data
+        const tbody = document.getElementById('ticketsTableBody');
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="text-center py-5">
+                    <i class="bi bi-exclamation-triangle fs-1 text-danger"></i>
+                    <p class="mt-2 text-danger">Gagal memuat data tickets</p>
+                    <small class="text-muted">${error.message}</small>
+                </td>
+            </tr>
+        `;
     }
-}
-
-function loadFallbackData() {
-    // Sample data for demonstration
-    ticketsData = [
-        {
-            id: 1,
-            ticket_number: 'TCK-20241029-0015',
-            name: 'Ahmad Rizki',
-            email: 'ahmad@email.com',
-            phone: '081234567890',
-            nik: '1234567890123456',
-            letter_type: 'surat_keterangan',
-            purpose: 'Keperluan administrasi bank',
-            status: 'pending',
-            created_at: '2024-10-29 10:30:00',
-            notes: null
-        },
-        {
-            id: 2,
-            ticket_number: 'TCK-20241029-0014',
-            name: 'Siti Nurhaliza',
-            email: 'siti@email.com',
-            phone: '081234567891',
-            nik: '1234567890123457',
-            letter_type: 'surat_domisili',
-            purpose: 'Pendaftaran sekolah anak',
-            status: 'processing',
-            created_at: '2024-10-29 09:15:00',
-            notes: 'Sedang dalam proses verifikasi'
-        },
-        {
-            id: 3,
-            ticket_number: 'TCK-20241029-0013',
-            name: 'Budi Santoso',
-            email: 'budi@email.com',
-            phone: '081234567892',
-            nik: '1234567890123458',
-            letter_type: 'surat_usaha',
-            purpose: 'Pembukaan usaha warung',
-            status: 'completed',
-            created_at: '2024-10-28 14:20:00',
-            notes: 'Surat telah selesai dan dapat diambil'
-        }
-    ];
-    
-    filteredTickets = [...ticketsData];
-    updateStatistics();
-    renderTicketsTable();
 }
 
 function updateStatistics() {
@@ -192,12 +152,12 @@ function updateStatistics() {
         acc.total++;
         acc[ticket.status] = (acc[ticket.status] || 0) + 1;
         return acc;
-    }, { total: 0, pending: 0, processing: 0, completed: 0, cancelled: 0 });
+    }, { total: 0, submitted: 0, in_review: 0, valid: 0, rejected: 0, generated: 0 });
 
     document.getElementById('totalTickets').textContent = stats.total;
-    document.getElementById('pendingTickets').textContent = stats.pending;
-    document.getElementById('processingTickets').textContent = stats.processing;
-    document.getElementById('completedTickets').textContent = stats.completed;
+    document.getElementById('submittedTickets').textContent = stats.submitted;
+    document.getElementById('inReviewTickets').textContent = stats.in_review;
+    document.getElementById('generatedTickets').textContent = stats.generated;
 }
 
 function renderTicketsTable() {
@@ -245,8 +205,8 @@ function renderTicketsTable() {
                         <button class="btn btn-sm btn-outline-primary" onclick="showTicketDetail(${ticket.id})" title="Lihat Detail">
                             <i class="bi bi-eye"></i>
                         </button>
-                        <button class="btn btn-sm btn-outline-success" onclick="updateTicketStatus(${ticket.id}, 'processing')" title="Proses">
-                            <i class="bi bi-play-circle"></i>
+                        <button class="btn btn-sm btn-outline-success" onclick="updateTicketStatus(${ticket.id}, 'in_review')" title="Review">
+                            <i class="bi bi-eye"></i>
                         </button>
                         <button class="btn btn-sm btn-outline-danger" onclick="deleteTicket(${ticket.id})" title="Hapus">
                             <i class="bi bi-trash"></i>
@@ -390,20 +350,22 @@ function getLetterTypeName(type) {
 
 function getStatusName(status) {
     const statuses = {
-        'pending': 'Menunggu',
-        'processing': 'Diproses',
-        'completed': 'Selesai',
-        'cancelled': 'Dibatalkan'
+        'submitted': 'Submitted',
+        'in_review': 'In Review',
+        'valid': 'Valid',
+        'rejected': 'Rejected',
+        'generated': 'Generated'
     };
     return statuses[status] || status;
 }
 
 function getStatusClass(status) {
     const classes = {
-        'pending': 'bg-warning',
-        'processing': 'bg-info',
-        'completed': 'bg-success',
-        'cancelled': 'bg-danger'
+        'submitted': 'bg-info',
+        'in_review': 'bg-warning',
+        'valid': 'bg-success',
+        'rejected': 'bg-danger',
+        'generated': 'bg-primary'
     };
     return classes[status] || 'bg-secondary';
 }
@@ -523,15 +485,21 @@ async function showTicketDetail(ticketId) {
     `;
 
     // Setup action buttons
-    const processBtn = document.getElementById('btnProcessTicket');
-    const completeBtn = document.getElementById('btnCompleteTicket');
+    const reviewBtn = document.getElementById('btnReviewTicket');
+    const validateBtn = document.getElementById('btnValidateTicket');
+    const generateBtn = document.getElementById('btnGenerateTicket');
+    const rejectBtn = document.getElementById('btnRejectTicket');
     
-    processBtn.onclick = () => updateTicketStatus(ticketId, 'processing');
-    completeBtn.onclick = () => updateTicketStatus(ticketId, 'completed');
+    reviewBtn.onclick = () => updateTicketStatus(ticketId, 'in_review');
+    validateBtn.onclick = () => updateTicketStatus(ticketId, 'valid');
+    generateBtn.onclick = () => updateTicketStatus(ticketId, 'generated');
+    rejectBtn.onclick = () => updateTicketStatus(ticketId, 'rejected');
     
     // Show appropriate buttons based on status
-    processBtn.style.display = ticket.status === 'pending' ? 'inline-block' : 'none';
-    completeBtn.style.display = ticket.status !== 'completed' ? 'inline-block' : 'none';
+    reviewBtn.style.display = ticket.status === 'submitted' ? 'inline-block' : 'none';
+    validateBtn.style.display = ticket.status === 'in_review' ? 'inline-block' : 'none';
+    generateBtn.style.display = ticket.status === 'valid' ? 'inline-block' : 'none';
+    rejectBtn.style.display = ticket.status !== 'rejected' && ticket.status !== 'generated' ? 'inline-block' : 'none';
 
     const modal = new bootstrap.Modal(document.getElementById('ticketDetailModal'));
     modal.show();

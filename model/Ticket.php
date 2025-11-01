@@ -370,5 +370,58 @@ class Ticket {
             return false;
         }
     }
+    
+    /**
+     * Bulk update ticket status
+     */
+    public function bulkUpdateStatus($ticketIds, $status) {
+        try {
+            if (!$this->isValidStatus($status)) {
+                return ['success' => false, 'error' => 'Invalid status'];
+            }
+            
+            $placeholders = str_repeat('?,', count($ticketIds) - 1) . '?';
+            $query = "UPDATE tickets SET status = ?, updated_at = NOW() WHERE id IN ($placeholders)";
+            
+            $params = array_merge([$status], $ticketIds);
+            $stmt = $this->pdo->prepare($query);
+            $stmt->execute($params);
+            
+            return [
+                'success' => true,
+                'affected_rows' => $stmt->rowCount()
+            ];
+        } catch (Exception $e) {
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+    
+    /**
+     * Bulk delete tickets
+     */
+    public function bulkDelete($ticketIds) {
+        try {
+            $placeholders = str_repeat('?,', count($ticketIds) - 1) . '?';
+            $query = "DELETE FROM tickets WHERE id IN ($placeholders)";
+            
+            $stmt = $this->pdo->prepare($query);
+            $stmt->execute($ticketIds);
+            
+            return [
+                'success' => true,
+                'affected_rows' => $stmt->rowCount()
+            ];
+        } catch (Exception $e) {
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+    
+    /**
+     * Validate ticket status
+     */
+    public function isValidStatus($status) {
+        $validStatuses = ['submitted', 'in_review', 'valid', 'rejected', 'generated'];
+        return in_array($status, $validStatuses);
+    }
 }
 ?>

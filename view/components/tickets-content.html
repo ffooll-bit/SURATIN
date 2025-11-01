@@ -34,30 +34,30 @@
             </div>
         </div>
         <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card stats-card bg-warning text-white">
+            <div class="card stats-card bg-info text-white">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h3 class="card-title mb-1" id="pendingTickets">0</h3>
-                            <p class="card-text mb-0">Menunggu</p>
+                            <h3 class="card-title mb-1" id="submittedTickets">0</h3>
+                            <p class="card-text mb-0">Submitted</p>
                         </div>
                         <div class="stats-icon bg-light bg-opacity-25">
-                            <i class="bi bi-hourglass-split text-white"></i>
+                            <i class="bi bi-file-earmark-plus text-white"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card stats-card bg-info text-white">
+            <div class="card stats-card bg-warning text-white">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h3 class="card-title mb-1" id="processingTickets">0</h3>
-                            <p class="card-text mb-0">Diproses</p>
+                            <h3 class="card-title mb-1" id="inReviewTickets">0</h3>
+                            <p class="card-text mb-0">Pending Review</p>
                         </div>
                         <div class="stats-icon bg-light bg-opacity-25">
-                            <i class="bi bi-gear-fill text-white"></i>
+                            <i class="bi bi-hourglass-split text-white"></i>
                         </div>
                     </div>
                 </div>
@@ -68,11 +68,11 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h3 class="card-title mb-1" id="completedTickets">0</h3>
-                            <p class="card-text mb-0">Selesai</p>
+                            <h3 class="card-title mb-1" id="generatedTickets">0</h3>
+                            <p class="card-text mb-0">Generated</p>
                         </div>
                         <div class="stats-icon bg-light bg-opacity-25">
-                            <i class="bi bi-check-circle-fill text-white"></i>
+                            <i class="bi bi-file-earmark-check text-white"></i>
                         </div>
                     </div>
                 </div>
@@ -96,10 +96,11 @@
                     <label for="statusFilter" class="form-label">Status</label>
                     <select class="form-select" id="statusFilter">
                         <option value="">Semua Status</option>
-                        <option value="pending">Menunggu</option>
-                        <option value="processing">Diproses</option>
-                        <option value="completed">Selesai</option>
-                        <option value="cancelled">Dibatalkan</option>
+                        <option value="submitted">Submitted</option>
+                        <option value="in_review">In Review</option>
+                        <option value="valid">Valid</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="generated">Generated</option>
                     </select>
                 </div>
                 <div class="col-md-2">
@@ -128,7 +129,7 @@
                 </div>
             </div>
             <div class="row mt-3">
-                <div class="col-12">
+                <div class="col-12 d-flex flex-wrap gap-2">
                     <button class="btn btn-primary me-2" onclick="applyFilters()">
                         <i class="bi bi-funnel me-1"></i>Terapkan Filter
                     </button>
@@ -204,16 +205,22 @@
                     <span id="selectedCount">0</span> tickets dipilih
                 </span>
                 <div class="btn-group">
-                    <button class="btn btn-sm btn-success" onclick="bulkUpdateStatus('processing')">
-                        <i class="bi bi-play-circle me-1"></i>Proses
+                    <button class="btn btn-sm btn-info" onclick="bulkUpdateStatus('in_review')">
+                        <i class="bi bi-eye me-1"></i>Review
                     </button>
-                    <button class="btn btn-sm btn-primary" onclick="bulkUpdateStatus('completed')">
-                        <i class="bi bi-check-circle me-1"></i>Selesai
+                    <button class="btn btn-sm btn-success" onclick="bulkUpdateStatus('valid')">
+                        <i class="bi bi-check-circle me-1"></i>Valid
                     </button>
-                    <button class="btn btn-sm btn-warning" onclick="bulkUpdateStatus('pending')">
-                        <i class="bi bi-pause-circle me-1"></i>Tunda
+                    <button class="btn btn-sm btn-primary" onclick="bulkUpdateStatus('generated')">
+                        <i class="bi bi-file-earmark-check me-1"></i>Buat Surat
                     </button>
-                    <button class="btn btn-sm btn-danger" onclick="bulkDelete()">
+                    <button class="btn btn-sm btn-warning" onclick="bulkUpdateStatus('submitted')">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i>Kembalikan
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="bulkUpdateStatus('rejected')">
+                        <i class="bi bi-x-circle me-1"></i>Tolak
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="bulkDelete()">
                         <i class="bi bi-trash me-1"></i>Hapus
                     </button>
                 </div>
@@ -236,11 +243,17 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                 <div class="btn-group">
-                    <button type="button" class="btn btn-success" id="btnProcessTicket">
-                        <i class="bi bi-play-circle me-1"></i>Proses
+                    <button type="button" class="btn btn-info" id="btnReviewTicket">
+                        <i class="bi bi-eye me-1"></i>Review
                     </button>
-                    <button type="button" class="btn btn-primary" id="btnCompleteTicket">
-                        <i class="bi bi-check-circle me-1"></i>Selesai
+                    <button type="button" class="btn btn-success" id="btnValidateTicket">
+                        <i class="bi bi-check-circle me-1"></i>Valid
+                    </button>
+                    <button type="button" class="btn btn-primary" id="btnGenerateTicket">
+                        <i class="bi bi-file-earmark-check me-1"></i>Buat Surat
+                    </button>
+                    <button type="button" class="btn btn-danger" id="btnRejectTicket">
+                        <i class="bi bi-x-circle me-1"></i>Tolak
                     </button>
                 </div>
             </div>

@@ -199,6 +199,22 @@ if (!isset($_SESSION['admin_logged_in'])) {
                     <small id="adminRole">Admin</small>
                 </div>
             </div>
+            
+            <!-- Server Time Display -->
+            <div class="card bg-dark bg-opacity-25 border-0 mt-3">
+                <div class="card-body text-white text-center py-2">
+                    <div class="d-flex align-items-center justify-content-center mb-1">
+                        <i class="bi bi-clock me-2" aria-hidden="true"></i>
+                        <small class="text-white-75">Server Time</small>
+                    </div>
+                    <div id="serverTime" class="fw-bold" style="font-size: 0.9rem;">
+                        <?= date('H:i:s'); ?>
+                    </div>
+                    <small id="serverDate" class="text-white-50" style="font-size: 0.75rem;">
+                        <?= date('d M Y'); ?>
+                    </small>
+                </div>
+            </div>
         </div>
     </nav>
 
@@ -459,10 +475,103 @@ if (!isset($_SESSION['admin_logged_in'])) {
             });
         });
 
+        // Server time management
+        let serverTimeOffset = 0; // Difference between server and client time
+        let serverTimeInterval;
+        let syncAttempts = 0;
+        const maxSyncAttempts = 3;
+        
+        function syncServerTime() {
+            const clientTime = new Date();
+            
+            fetch('controller/api/server-time.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const serverTime = new Date(data.timestamp * 1000);
+                        const currentClientTime = new Date();
+                        
+                        // Calculate offset between server and client
+                        serverTimeOffset = serverTime.getTime() - currentClientTime.getTime();
+                        
+                        // Update display immediately
+                        updateTimeDisplay();
+                        
+                        syncAttempts++;
+                        
+                        // Sync a few more times for accuracy
+                        if (syncAttempts <= maxSyncAttempts) {
+                            setTimeout(syncServerTime, 500);
+                        } else {
+                            // Start local time updates after syncing
+                            startLocalTimeUpdate();
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error syncing server time:', error);
+                    syncAttempts++;
+                    
+                    if (syncAttempts < maxSyncAttempts) {
+                        // Retry sync after 3 seconds
+                        setTimeout(syncServerTime, 3000);
+                    } else {
+                        // Fallback to client time if all syncs fail
+                        serverTimeOffset = 0;
+                        startLocalTimeUpdate();
+                    }
+                });
+        }
+        
+        function updateTimeDisplay() {
+            const now = new Date(Date.now() + serverTimeOffset);
+            
+            // Format time as HH:MM:SS
+            const timeString = now.toLocaleTimeString('id-ID', {
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            
+            // Format date
+            const dateString = now.toLocaleDateString('id-ID', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
+            
+            document.getElementById('serverTime').textContent = timeString;
+            document.getElementById('serverDate').textContent = dateString;
+        }
+        
+        function startLocalTimeUpdate() {
+            // Update display every second using local time + offset
+            serverTimeInterval = setInterval(updateTimeDisplay, 1000);
+        }
+        
+        function stopServerTimeUpdate() {
+            if (serverTimeInterval) {
+                clearInterval(serverTimeInterval);
+                serverTimeInterval = null;
+            }
+        }
+        
+        function startServerTimeSync() {
+            syncAttempts = 0;
+            syncServerTime(); // Start initial sync
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             loadAdminInfo();
             showSection('dashboard'); // Load dashboard by default
+            startServerTimeSync(); // Start server time sync
+        });
+
+        // Clean up on page unload
+        window.addEventListener('beforeunload', function() {
+            stopServerTimeUpdate();
         });
     </script>
 </body>

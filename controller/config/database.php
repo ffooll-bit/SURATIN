@@ -35,7 +35,7 @@ class Database {
     
     private function __construct() {
         // Set timezone for database connections
-        $this->config['options'][PDO::MYSQL_ATTR_INIT_COMMAND] = "SET time_zone = '+08:00'";
+        $this->config['options'][PDO::MYSQL_ATTR_INIT_COMMAND] = "SET time_zone = '" . APP_UTC_TIMEZONE . "'";
     }
     
     /**

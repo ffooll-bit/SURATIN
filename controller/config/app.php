@@ -4,9 +4,6 @@
  * Central configuration for application settings
  */
 
-// Set timezone for entire application
-date_default_timezone_set('Asia/Makassar');
-
 // Application settings
 define('APP_NAME', 'SURATIN');
 define('APP_DESCRIPTION', 'Sistem Urus Surat Terintegrasi');
@@ -16,8 +13,9 @@ define('APP_ENV', 'development'); // development, staging, production
 
 // Timezone settings
 define('APP_TIMEZONE', 'Asia/Makassar');
-define('DATE_FORMAT', 'Y-m-d H:i:s');
-define('DISPLAY_DATE_FORMAT', 'd/m/Y H:i');
+define('APP_UTC_TIMEZONE', '+08:00');
+// define('DATE_FORMAT', 'Y-m-d H:i:s');
+// define('DISPLAY_DATE_FORMAT', 'd/m/Y H:i');
 // define('DISPLAY_DATE_ONLY', 'd/m/Y'); // Not used - commented out
 
 // File upload settings (commented out - not implemented yet)
@@ -44,6 +42,9 @@ define('SESSION_LIFETIME', 3600 * 8); // 8 hours in seconds
 // Debug settings
 define('DEBUG_MODE', APP_ENV === 'development');
 // define('LOG_ERRORS', true); // Not used - commented out
+
+// Set timezone for entire application
+date_default_timezone_set(APP_TIMEZONE);
 
 // Initialize error reporting based on environment
 if (DEBUG_MODE) {

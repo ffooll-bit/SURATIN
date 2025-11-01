@@ -261,6 +261,7 @@ if (!isset($_SESSION['admin_logged_in'])) {
                 <!-- Default: Load dashboard content -->
             </div>
         </main>
+    </div>
 
     <!-- Scripts -->
     <script src="view/assets/bootstrap-5.3.8/js/bootstrap.bundle.min.js"></script>
@@ -342,7 +343,7 @@ if (!isset($_SESSION['admin_logged_in'])) {
                     resolve();
                 };
                 script.onerror = reject;
-                document.head.appendChild(script);
+                document.body.appendChild(script);
             });
         }
         
@@ -359,7 +360,7 @@ if (!isset($_SESSION['admin_logged_in'])) {
                     promises.push(new Promise(resolve => {
                         const newScript = document.createElement('script');
                         newScript.textContent = script.textContent;
-                        document.head.appendChild(newScript);
+                        document.body.appendChild(newScript);
                         resolve();
                     }));
                 }

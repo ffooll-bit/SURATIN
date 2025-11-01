@@ -308,162 +308,335 @@ if (!isset($_SESSION['admin_logged_in'])) {
             }
         }
 
-        // Content management
+        // Advanced Section Management System
         let currentSection = 'dashboard';
-        
-        function showSection(section) {
-            // Update active nav link
-            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
-                link.classList.remove('active');
-            });
-            document.querySelector(`[href="#${section}"]`).classList.add('active');
-            
-            // Update page title
-            document.querySelector('.navbar-brand').textContent = section.charAt(0).toUpperCase() + section.slice(1);
-            
-            // Load content
-            loadSectionContent(section);
-            currentSection = section;
-        }
-        
-        // Content-specific script management
-        const loadedScripts = new Set();
-        
-        function loadScript(src) {
-            return new Promise((resolve, reject) => {
-                if (loadedScripts.has(src)) {
-                    resolve();
+        let sectionManager = null;
+
+        // Section lifecycle manager
+        class SectionManager {
+            constructor() {
+                this.currentSection = null;
+                this.loadedScripts = new Map(); // Map of section -> Set of loaded scripts
+                this.scriptElements = new Map(); // Map of script src -> DOM element
+                this.sectionIntervals = new Map(); // Map of section -> Set of intervals
+                this.sectionTimeouts = new Map(); // Map of section -> Set of timeouts
+                this.sectionEventListeners = new Map(); // Map of section -> Array of cleanup functions
+                this.globalFunctions = new Map(); // Map of section -> Set of function names
+                this.isTransitioning = false;
+            }
+
+            // Register interval for current section
+            addInterval(intervalId) {
+                if (!this.currentSection) return;
+                if (!this.sectionIntervals.has(this.currentSection)) {
+                    this.sectionIntervals.set(this.currentSection, new Set());
+                }
+                this.sectionIntervals.get(this.currentSection).add(intervalId);
+            }
+
+            // Register timeout for current section
+            addTimeout(timeoutId) {
+                if (!this.currentSection) return;
+                if (!this.sectionTimeouts.has(this.currentSection)) {
+                    this.sectionTimeouts.set(this.currentSection, new Set());
+                }
+                this.sectionTimeouts.get(this.currentSection).add(timeoutId);
+            }
+
+            // Register event listener cleanup function for current section
+            addEventListener(cleanupFunction) {
+                if (!this.currentSection) return;
+                if (!this.sectionEventListeners.has(this.currentSection)) {
+                    this.sectionEventListeners.set(this.currentSection, []);
+                }
+                this.sectionEventListeners.get(this.currentSection).push(cleanupFunction);
+            }
+
+            // Register global function for current section
+            addGlobalFunction(functionName) {
+                if (!this.currentSection) return;
+                if (!this.globalFunctions.has(this.currentSection)) {
+                    this.globalFunctions.set(this.currentSection, new Set());
+                }
+                this.globalFunctions.get(this.currentSection).add(functionName);
+            }
+
+            // Load script for section
+            async loadScript(src, section) {
+                if (!this.loadedScripts.has(section)) {
+                    this.loadedScripts.set(section, new Set());
+                }
+
+                if (this.loadedScripts.get(section).has(src)) {
+                    return Promise.resolve();
+                }
+
+                return new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    script.src = src;
+                    script.dataset.section = section;
+                    script.onload = () => {
+                        this.loadedScripts.get(section).add(src);
+                        this.scriptElements.set(src, script);
+                        resolve();
+                    };
+                    script.onerror = reject;
+                    document.head.appendChild(script);
+                });
+            }
+
+            // Cleanup section completely
+            cleanupSection(section) {
+                console.log(`Cleaning up section: ${section}`);
+
+                // Clear intervals
+                if (this.sectionIntervals.has(section)) {
+                    this.sectionIntervals.get(section).forEach(intervalId => {
+                        clearInterval(intervalId);
+                    });
+                    this.sectionIntervals.delete(section);
+                }
+
+                // Clear timeouts
+                if (this.sectionTimeouts.has(section)) {
+                    this.sectionTimeouts.get(section).forEach(timeoutId => {
+                        clearTimeout(timeoutId);
+                    });
+                    this.sectionTimeouts.delete(section);
+                }
+
+                // Remove event listeners
+                if (this.sectionEventListeners.has(section)) {
+                    this.sectionEventListeners.get(section).forEach(cleanupFn => {
+                        try {
+                            cleanupFn();
+                        } catch (e) {
+                            console.warn('Error during event listener cleanup:', e);
+                        }
+                    });
+                    this.sectionEventListeners.delete(section);
+                }
+
+                // Remove global functions
+                if (this.globalFunctions.has(section)) {
+                    this.globalFunctions.get(section).forEach(funcName => {
+                        try {
+                            delete window[funcName];
+                        } catch (e) {
+                            window[funcName] = undefined;
+                        }
+                    });
+                    this.globalFunctions.delete(section);
+                }
+
+                // Remove scripts
+                if (this.loadedScripts.has(section)) {
+                    this.loadedScripts.get(section).forEach(src => {
+                        if (this.scriptElements.has(src)) {
+                            const script = this.scriptElements.get(src);
+                            if (script.parentNode) {
+                                script.parentNode.removeChild(script);
+                            }
+                            this.scriptElements.delete(src);
+                        }
+                    });
+                    this.loadedScripts.delete(section);
+                }
+
+                // Call section-specific cleanup if available
+                const cleanupFunctionName = `cleanup${section.charAt(0).toUpperCase() + section.slice(1)}`;
+                if (typeof window[cleanupFunctionName] === 'function') {
+                    try {
+                        window[cleanupFunctionName]();
+                    } catch (e) {
+                        console.warn(`Error during ${cleanupFunctionName}:`, e);
+                    }
+                }
+            }
+
+            // Switch to new section
+            async switchToSection(newSection) {
+                if (this.isTransitioning) {
+                    console.warn('Section transition already in progress');
                     return;
                 }
-                
-                const script = document.createElement('script');
-                script.src = src;
-                script.onload = () => {
-                    loadedScripts.add(src);
-                    resolve();
-                };
-                script.onerror = reject;
-                document.body.appendChild(script);
-            });
-        }
-        
-        function executeScriptsInContainer(container) {
-            const scripts = container.querySelectorAll('script');
-            const promises = [];
-            
-            scripts.forEach(script => {
-                if (script.src) {
-                    // External script
-                    promises.push(loadScript(script.src));
-                } else {
-                    // Inline script
-                    promises.push(new Promise(resolve => {
-                        const newScript = document.createElement('script');
-                        newScript.textContent = script.textContent;
-                        document.body.appendChild(newScript);
-                        resolve();
-                    }));
+
+                if (this.currentSection === newSection) {
+                    console.log('Already on section:', newSection);
+                    return;
                 }
-                script.remove();
-            });
-            
-            return Promise.all(promises);
+
+                this.isTransitioning = true;
+
+                try {
+                    // Cleanup current section
+                    if (this.currentSection) {
+                        this.cleanupSection(this.currentSection);
+                    }
+
+                    // Set new section
+                    this.currentSection = newSection;
+
+                    // Update UI
+                    this.updateNavigation(newSection);
+                    
+                    // Load new section
+                    await this.loadSectionContent(newSection);
+
+                } catch (error) {
+                    console.error('Error during section transition:', error);
+                } finally {
+                    this.isTransitioning = false;
+                }
+            }
+
+            updateNavigation(section) {
+                // Update active nav link
+                document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                    link.classList.remove('active');
+                });
+                
+                const activeLink = document.querySelector(`[href="#${section}"]`);
+                if (activeLink) {
+                    activeLink.classList.add('active');
+                }
+                
+                // Update page title
+                const titleElement = document.querySelector('.navbar-brand');
+                if (titleElement) {
+                    titleElement.textContent = section.charAt(0).toUpperCase() + section.slice(1);
+                }
+            }
+
+            async loadSectionContent(section) {
+                const container = document.getElementById('content-container');
+                if (!container) return;
+
+                // Show loading state
+                container.innerHTML = `
+                    <div class="d-flex justify-content-center align-items-center" style="min-height: 300px;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                `;
+
+                try {
+                    const sectionConfig = this.getSectionConfig(section);
+                    
+                    // Load script first
+                    if (sectionConfig.script) {
+                        await this.loadScript(sectionConfig.script, section);
+                    }
+
+                    // Load HTML content
+                    const response = await fetch(sectionConfig.template);
+                    if (!response.ok) {
+                        throw new Error(`Failed to load template: ${response.statusText}`);
+                    }
+                    
+                    const html = await response.text();
+                    container.innerHTML = html;
+
+                    // Initialize section
+                    if (sectionConfig.initFunction && typeof window[sectionConfig.initFunction] === 'function') {
+                        // Add initialization function to global functions for cleanup
+                        this.addGlobalFunction(sectionConfig.initFunction);
+                        
+                        // Wait a bit for DOM to settle
+                        setTimeout(() => {
+                            try {
+                                window[sectionConfig.initFunction]();
+                            } catch (e) {
+                                console.error(`Error initializing section ${section}:`, e);
+                            }
+                        }, 100);
+                    }
+
+                } catch (error) {
+                    console.error(`Error loading section ${section}:`, error);
+                    container.innerHTML = `
+                        <div class="alert alert-danger" role="alert">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            Error loading ${section} content. Please try again.
+                        </div>
+                    `;
+                }
+            }
+
+            getSectionConfig(section) {
+                const configs = {
+                    'dashboard': {
+                        script: './view/assets/js/dashboard.js',
+                        template: './view/components/dashboard-content.html',
+                        initFunction: 'initializeDashboard'
+                    },
+                    'tickets': {
+                        script: './view/assets/js/tickets.js',
+                        template: './view/components/tickets-content.html',
+                        initFunction: 'initializeTickets'
+                    },
+                    'templates': {
+                        script: './view/assets/js/templates.js',
+                        template: './view/components/templates-content.html',
+                        initFunction: 'initializeTemplates'
+                    },
+                    'settings': {
+                        script: './view/assets/js/settings.js',
+                        template: './view/components/settings-content.html',
+                        initFunction: 'initializeSettings'
+                    }
+                };
+
+                return configs[section] || {
+                    template: './view/components/not-found.html',
+                    initFunction: null
+                };
+            }
         }
+
+        // Initialize section manager
+        sectionManager = new SectionManager();
+
+        // Enhanced showSection function
+        function showSection(section) {
+            if (sectionManager) {
+                sectionManager.switchToSection(section);
+                currentSection = section;
+            }
+        }
+
+        // Global helper functions for sections to register their resources
+        window.registerInterval = function(intervalId) {
+            if (sectionManager) {
+                sectionManager.addInterval(intervalId);
+            }
+            return intervalId;
+        };
+
+        window.registerTimeout = function(timeoutId) {
+            if (sectionManager) {
+                sectionManager.addTimeout(timeoutId);
+            }
+            return timeoutId;
+        };
+
+        window.registerEventListener = function(cleanupFunction) {
+            if (sectionManager) {
+                sectionManager.addEventListener(cleanupFunction);
+            }
+        };
+
+        window.registerGlobalFunction = function(functionName) {
+            if (sectionManager) {
+                sectionManager.addGlobalFunction(functionName);
+            }
+        };
         
+        // Legacy function - now handled by SectionManager
         function loadSectionContent(section) {
-            const container = document.getElementById('content-container');
-            
-            switch(section) {
-                case 'dashboard':
-                    // Load dashboard-specific script first
-                    loadScript('./view/assets/js/dashboard.js')
-                        .then(() => {
-                            return fetch('./view/components/dashboard-content.html');
-                        })
-                        .then(response => response.text())
-                        .then(html => {
-                            container.innerHTML = html;
-                            // Execute any inline scripts in the loaded content
-                            return executeScriptsInContainer(container);
-                        })
-                        .then(() => {
-                            // Initialize dashboard after everything is loaded
-                            setTimeout(() => {
-                                if (typeof initializeDashboard === 'function') {
-                                    initializeDashboard();
-                                } else {
-                                    console.error('initializeDashboard function not found');
-                                }
-                            }, 100);
-                        })
-                        .catch(error => {
-                            console.error('Error loading dashboard:', error);
-                            container.innerHTML = '<div class="alert alert-danger">Error loading dashboard content</div>';
-                        });
-                    break;
-                    
-                case 'tickets':
-                    // Load tickets-specific script when implemented
-                    fetch('./view/components/tickets-content.html')
-                        .then(response => response.text())
-                        .then(html => {
-                            container.innerHTML = html;
-                            return executeScriptsInContainer(container);
-                        })
-                        .then(() => {
-                            // Initialize tickets functionality
-                            if (typeof initializeTickets === 'function') {
-                                initializeTickets();
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error loading tickets:', error);
-                            container.innerHTML = '<div class="alert alert-info">Tickets section - Coming soon!</div>';
-                        });
-                    break;
-                    
-                case 'templates':
-                    // Load templates-specific script when implemented
-                    fetch('./view/components/templates-content.html')
-                        .then(response => response.text())
-                        .then(html => {
-                            container.innerHTML = html;
-                            return executeScriptsInContainer(container);
-                        })
-                        .then(() => {
-                            // Initialize templates functionality
-                            if (typeof initializeTemplates === 'function') {
-                                initializeTemplates();
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error loading templates:', error);
-                            container.innerHTML = '<div class="alert alert-info">Templates section - Coming soon!</div>';
-                        });
-                    break;
-                    
-                case 'settings':
-                    // Load settings-specific script when implemented
-                    fetch('./view/components/settings-content.html')
-                        .then(response => response.text())
-                        .then(html => {
-                            container.innerHTML = html;
-                            return executeScriptsInContainer(container);
-                        })
-                        .then(() => {
-                            // Initialize settings functionality
-                            if (typeof initializeSettings === 'function') {
-                                initializeSettings();
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error loading settings:', error);
-                            container.innerHTML = '<div class="alert alert-info">Settings section - Coming soon!</div>';
-                        });
-                    break;
-                    
-                default:
-                    container.innerHTML = '<div class="alert alert-warning">Section not found</div>';
+            if (sectionManager) {
+                sectionManager.loadSectionContent(section);
             }
         }
         
@@ -566,7 +739,12 @@ if (!isset($_SESSION['admin_logged_in'])) {
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             loadAdminInfo();
-            showSection('dashboard'); // Load dashboard by default
+            
+            // Initialize section manager and load default section
+            if (sectionManager) {
+                showSection('dashboard'); // Load dashboard by default
+            }
+            
             startServerTimeSync(); // Start server time sync
         });
 

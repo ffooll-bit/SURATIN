@@ -71,24 +71,23 @@ function createActivityModal() {
                                 <button class="btn btn-sm btn-outline-primary" onclick="loadAllActivity(1)">
                                     <i class="bi bi-arrow-clockwise"></i>
                                 </button>
+                                <!-- Pagination -->
+                                <nav aria-label="Activity pagination">
+                                    <ul class="pagination pagination-sm justify-content-center mb-0" id="activityPagination">
+                                        <!-- Pagination will be generated here -->
+                                    </ul>
+                                </nav>
                             </div>
                             <small class="text-muted" id="activityCount">Loading...</small>
                         </div>
                         
-                        <div id="allActivityList" class="list-group" style="max-height: 400px; overflow-y: auto;">
+                        <div id="allActivityList" class="list-group">
                             <!-- Activity items will be loaded here -->
                             <div class="text-center py-4">
                                 <div class="spinner-border spinner-border-sm text-muted" role="status"></div>
                                 <div class="mt-2 text-muted">Loading all activity...</div>
                             </div>
                         </div>
-                        
-                        <!-- Pagination -->
-                        <nav aria-label="Activity pagination" class="mt-3">
-                            <ul class="pagination pagination-sm justify-content-center mb-0" id="activityPagination">
-                                <!-- Pagination will be generated here -->
-                            </ul>
-                        </nav>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -104,7 +103,7 @@ function createActivityModal() {
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
-function loadAllActivity(page = 1, limit = 15) {
+function loadAllActivity(page = 1, limit = 5) {
     const container = document.getElementById('allActivityList');
     const countElement = document.getElementById('activityCount');
     const statusFilter = document.getElementById('activityStatusFilter')?.value || '';
@@ -222,7 +221,7 @@ function updateActivityPagination(pagination) {
     `;
     
     // Page numbers
-    const maxVisiblePages = 5;
+    const maxVisiblePages = 3;
     let startPage = Math.max(1, current_page - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(last_page, startPage + maxVisiblePages - 1);
     

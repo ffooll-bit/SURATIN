@@ -4,7 +4,7 @@
  * SURATIN - Sistem Urus Surat Terintegrasi
  * Entry Point / Landing Page
  * 
- * @author SURATIN Development Team
+ * @author FFOOLL-BIT
  * @version 1.0
  */
 

@@ -4,6 +4,9 @@
  * Centralized database configuration and connection management
  */
 
+// Include app configuration
+require_once __DIR__ . '/app.php';
+
 class Database {
     private static $instance = null;
     private $pdo = null;
@@ -24,7 +27,8 @@ class Database {
     ];
     
     private function __construct() {
-        // Private constructor for singleton
+        // Set timezone for database connections
+        $this->config['options'][PDO::MYSQL_ATTR_INIT_COMMAND] = "SET time_zone = '+08:00'";
     }
     
     /**

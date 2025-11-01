@@ -60,6 +60,15 @@ Tujuan: hasilkan komponen HTML/CSS/JS yang bisa diuji tanpa backend (mock data).
 
 Tujuan: front-end berkomunikasi ke back-end lewat API JSON; admin login via session.
 
+### Konfigurasi Aplikasi
+
+File `controller/config/app.php` berisi:
+* **Timezone**: Asia/Makassar (UTC+8)
+* **Format tanggal**: Indonesia format
+* **File upload**: Maksimal 5MB, tipe yang diizinkan
+* **Session**: 8 jam lifetime
+* **Debug mode**: Berdasarkan environment
+
 ### Struktur file (saran)
 
 ```
@@ -70,48 +79,28 @@ Tujuan: front-end berkomunikasi ke back-end lewat API JSON; admin login via sess
 │  │  ├─ css/
 │  │  ├─ js/
 │  │  └─ img/
-│  ├─ ticket-form.html         # Form pengajuan ticket
-│  ├─ check-status.html        # Cek status ticket
-│  ├─ success.html             # Halaman sukses submit
-│  ├─ admin/                   # Halaman admin (protected)
-│  │  ├─ login.html            # Login admin
-│  │  ├─ dashboard.html        # Dashboard admin
-│  │  ├─ ticket-detail.html    # Detail ticket
-│  │  └─ template-manager.html # Kelola template
+│  ├─ pages/                   # Halaman utama
+│  │  ├─ ticket-form.html      # Form pengajuan ticket
+│  │  ├─ check-status.html     # Cek status ticket
+│  │  ├─ success.html          # Halaman sukses submit
+│  │  ├─ admin-login.html      # Login admin
+│  │  └─ admin-dashboard.html  # Dashboard admin
 │  └─ components/              # Komponen reusable (modals, etc)
 ├─ controller/                 # PHP logika & API endpoints
 │  ├─ api/                     # REST API endpoints
 │  │  ├─ tickets.php           # CRUD tickets
 │  │  ├─ auth.php              # Login/logout admin
+│  │  ├─ dashboard.php         # Dashboard statistics
 │  │  ├─ templates.php         # Kelola template
 │  │  └─ status.php            # Cek status public
-│  ├─ admin/                   # Admin panel controllers
-│  │  ├─ dashboard.php         # Logic dashboard
-│  │  ├─ ticket-review.php     # Review & approve ticket
-│  │  └─ template-upload.php   # Upload & manage templates
-│  ├─ helpers/                 # Helper functions
-│  │  ├─ mailer.php            # Email sender
-│  │  ├─ docx-generator.php    # Generate dokumen
-│  │  ├─ whatsapp.php          # WA integration
-│  │  └─ utils.php             # General utilities
-│  └─ config/                  # Konfigurasi
-│     ├─ database.php          # DB connection
-│     └─ app.php               # App settings
+│  ├─ config/                  # Konfigurasi
+│  │  ├─ app.php               # App settings & timezone
+│  │  └─ database.php          # DB connection
+│  └─ helpers/                 # Helper functions
 ├─ model/                      # PHP untuk database & data layer
-│  ├─ Ticket.php               # Model ticket operations
-│  ├─ Admin.php                # Model admin/user
-│  ├─ Template.php             # Model template dokumen
-│  ├─ Letter.php               # Model surat yang dihasilkan
-│  └─ Database.php             # Base database class
 ├─ uploads/                    # File uploads (lampiran)
-│  └─ tickets/                 # Organized by ticket_code
 ├─ storage/                    # Generated files
-│  ├─ letters/                 # Surat yang dihasilkan (.docx/.pdf)
-│  ├─ templates/               # Template .docx
-│  └─ qrcodes/                 # QR code images
-├─ sql/
-│  └─ schema.sql               # Database schema
-└─ README.md
+└─ sql/                        # Database scripts
 ```
 
 > Catatan: `index.php` sebagai entry point yang bisa routing ke halaman yang tepat. File di `view/` adalah HTML statis yang berkomunikasi dengan `controller/api/` melalui AJAX/fetch.
@@ -261,14 +250,15 @@ Semua endpoint di `controller/api/*` mengembalikan JSON.
 9. [x] Buat DB schema (`sql/create-schema.sql`) dan `controller/config/database.php`.
 10. [x] Implement `model/Ticket.php` untuk CRUD operations.
 11. [x] Implement `controller/api/dashboard.php` untuk statistik dan aktivitas real-time.
-12. [ ] Implement `controller/api/tickets.php` (simpan: tickets + files).
-13. [ ] Implement `controller/api/status.php` untuk cek status publik.
-14. [x] Implement `model/Admin.php` dan `controller/api/auth.php`.
-15. [ ] Implement ticket review di `controller/admin/ticket-review.php`.
-16. [ ] Implement `model/Template.php` dan template manager.
-17. [ ] Implement generate surat di `controller/helpers/docx-generator.php`.
-18. [ ] Implement notifikasi di `controller/helpers/mailer.php` dan `whatsapp.php`.
-19. [ ] Add logging dan error handling.
+12. [x] Setup `controller/config/app.php` untuk timezone dan konfigurasi aplikasi.
+13. [ ] Implement `controller/api/tickets.php` (simpan: tickets + files).
+14. [ ] Implement `controller/api/status.php` untuk cek status publik.
+15. [x] Implement `model/Admin.php` dan `controller/api/auth.php`.
+16. [ ] Implement ticket review di `controller/admin/ticket-review.php`.
+17. [ ] Implement `model/Template.php` dan template manager.
+18. [ ] Implement generate surat di `controller/helpers/docx-generator.php`.
+19. [ ] Implement notifikasi di `controller/helpers/mailer.php` dan `whatsapp.php`.
+20. [ ] Add logging dan error handling.
 
 ### Sprint finishing
 

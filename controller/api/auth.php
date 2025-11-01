@@ -3,6 +3,9 @@ session_start();
 
 header('Content-Type: application/json');
 
+// Include app configuration
+require_once '../config/app.php';
+
 // Include database connection
 require_once '../config/database.php';
 

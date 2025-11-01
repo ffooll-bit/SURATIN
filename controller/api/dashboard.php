@@ -8,6 +8,9 @@ session_start();
 
 header('Content-Type: application/json');
 
+// Include app configuration
+require_once '../config/app.php';
+
 // Check if admin is logged in
 if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
     http_response_code(401);
@@ -214,17 +217,10 @@ try {
 }
 
 /**
- * Helper function to calculate time ago
+ * Helper function to calculate time ago using app timezone
  */
 function timeAgo($datetime) {
-    $time = time() - strtotime($datetime);
-    
-    if ($time < 60) return 'Just now';
-    if ($time < 3600) return floor($time/60) . ' min ago';
-    if ($time < 86400) return floor($time/3600) . ' hours ago';
-    if ($time < 2592000) return floor($time/86400) . ' days ago';
-    
-    return date('M j, Y', strtotime($datetime));
+    return getTimeAgo($datetime);
 }
 
 /**

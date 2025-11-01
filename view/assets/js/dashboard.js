@@ -546,18 +546,32 @@ function showRecentActivityError(message) {
     `;
 }
 
-// Initialize dashboard
-function initializeDashboard() {
+// Add timezone display to dashboard
+function addTimezoneInfo() {
+    const dashboardContent = document.getElementById('dashboard-content');
+    if (dashboardContent) {
+        const timezoneInfo = document.createElement('div');
+        timezoneInfo.className = 'text-muted small text-end mb-2';
+        timezoneInfo.innerHTML = `<i class="bi bi-clock me-1"></i>Timezone: Makassar (UTC+8)`;
+        dashboardContent.insertBefore(timezoneInfo, dashboardContent.firstChild);
+    }
+}
+
+// Global initialization function for dashboard
+window.initializeDashboard = function() {
+    // Remove the recursive call and directly call the functions
     console.log('Initializing dashboard...');
     if (document.getElementById('dashboard-content')) {
+        // Show timezone info in console for debugging
+        console.log('Dashboard timezone: Makassar (UTC+8)');
+        
         loadDashboardStats();
+        addTimezoneInfo();
+        
         // Auto refresh every 30 seconds
         setInterval(() => {
             console.log('Auto-refreshing dashboard...');
             loadDashboardStats();
         }, 30000);
     }
-}
-
-// Global initialization function for dashboard
-window.initializeDashboard = initializeDashboard;
+};

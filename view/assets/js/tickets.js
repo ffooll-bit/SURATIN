@@ -176,45 +176,77 @@ function renderTicketsTable() {
             </tr>
         `;
     } else {
-        tbody.innerHTML = pageTickets.map(ticket => `
-            <tr>
-                <td class="text-center">
-                    <input type="checkbox" class="form-check-input ticket-checkbox" 
-                           value="${ticket.id}" onchange="toggleTicketSelection(${ticket.id})">
-                </td>
-                <td>
-                    <strong>${ticket.ticket_number}</strong>
-                </td>
-                <td>
-                    <div>
-                        <strong>${ticket.name}</strong>
-                        ${ticket.email ? `<br><small class="text-muted">${ticket.email}</small>` : ''}
-                    </div>
-                </td>
-                <td>${getLetterTypeName(ticket.letter_type)}</td>
-                <td class="text-center">
-                    <span class="badge status-badge ${getStatusClass(ticket.status)}">
-                        ${getStatusName(ticket.status)}
-                    </span>
-                </td>
-                <td>
-                    <small>${formatDate(ticket.created_at)}</small>
-                </td>
-                <td class="text-center">
-                    <div class="btn-group" role="group">
-                        <button class="btn btn-sm btn-outline-primary" onclick="showTicketDetail(${ticket.id})" title="Lihat Detail">
-                            <i class="bi bi-eye"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-success" onclick="updateTicketStatus(${ticket.id}, 'in_review')" title="Review">
-                            <i class="bi bi-eye"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteTicket(${ticket.id})" title="Hapus">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        `).join('');
+        tbody.innerHTML = pageTickets.map(ticket => {
+            // Generate action buttons based on status
+            let actionButtons = `
+                <button class="btn btn-sm btn-outline-primary" onclick="showTicketDetail(${ticket.id})" title="Lihat Detail">
+                    <i class="bi bi-eye"></i>
+                </button>
+            `;
+            
+            // Add status-specific buttons
+            if (ticket.status === 'submitted') {
+                actionButtons += `
+                    <button class="btn btn-sm btn-outline-warning" onclick="updateTicketStatus(${ticket.id}, 'in_review')" title="Review">
+                        <i class="bi bi-search"></i>
+                    </button>
+                `;
+            } else if (ticket.status === 'in_review') {
+                actionButtons += `
+                    <button class="btn btn-sm btn-outline-success" onclick="updateTicketStatus(${ticket.id}, 'valid')" title="Valid">
+                        <i class="bi bi-check-circle"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="updateTicketStatus(${ticket.id}, 'rejected')" title="Reject">
+                        <i class="bi bi-x-circle"></i>
+                    </button>
+                `;
+            } else if (ticket.status === 'valid') {
+                actionButtons += `
+                    <button class="btn btn-sm btn-outline-info" onclick="updateTicketStatus(${ticket.id}, 'generated')" title="Generate">
+                        <i class="bi bi-file-text"></i>
+                    </button>
+                `;
+            }
+            
+            // Always add delete button
+            actionButtons += `
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteTicket(${ticket.id})" title="Hapus">
+                    <i class="bi bi-trash"></i>
+                </button>
+            `;
+            
+            return `
+                <tr>
+                    <td class="text-center">
+                        <input type="checkbox" class="form-check-input ticket-checkbox" 
+                               value="${ticket.id}" onchange="toggleTicketSelection(${ticket.id})">
+                    </td>
+                    <td>
+                        <strong>${ticket.ticket_number}</strong>
+                    </td>
+                    <td>
+                        <div>
+                            <strong>${ticket.name}</strong>
+                            ${ticket.email ? `<br><small class="text-muted">${ticket.email}</small>` : ''}
+                        </div>
+                    </td>
+                    <td>${getLetterTypeName(ticket.letter_type)}</td>
+                    <td class="text-center">
+                        <span class="badge status-badge ${getStatusClass(ticket.status)}">
+                            ${getStatusName(ticket.status)}
+                        </span>
+                    </td>
+                    <td>
+                        <small>${formatDate(ticket.created_at)}</small>
+                    </td>
+                    <td class="text-center">
+                        <div class="btn-group" role="group">
+                            ${actionButtons}
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
     }
 
     // Update pagination
@@ -452,54 +484,47 @@ async function showTicketDetail(ticketId) {
                 ${ticket.name}
             </div>
             <div class="col-md-6">
-                <strong>NIK:</strong><br>
-                ${ticket.nik}
+                <strong>NPM:</strong><br>
+                ${ticket.npm || '-'}
+            </div>
+            <div class="col-md-6">
+                <strong>Program Studi:</strong><br>
+                ${ticket.prodi || '-'}
             </div>
             <div class="col-md-6">
                 <strong>Email:</strong><br>
                 ${ticket.email || '-'}
             </div>
             <div class="col-md-6">
-                <strong>Telepon:</strong><br>
-                ${ticket.phone || '-'}
+                <strong>WhatsApp:</strong><br>
+                ${ticket.wa || '-'}
             </div>
             <div class="col-12">
                 <strong>Jenis Surat:</strong><br>
                 ${getLetterTypeName(ticket.letter_type)}
             </div>
-            <div class="col-12">
-                <strong>Keperluan:</strong><br>
-                ${ticket.purpose}
-            </div>
-            ${ticket.notes ? `
+            ${ticket.data ? `
                 <div class="col-12">
-                    <strong>Catatan:</strong><br>
-                    ${ticket.notes}
+                    <strong>Data Tambahan:</strong><br>
+                    <pre class="bg-light p-2 rounded">${JSON.stringify(ticket.data, null, 2)}</pre>
                 </div>
             ` : ''}
-            <div class="col-12">
+            ${ticket.admin_note ? `
+                <div class="col-12">
+                    <strong>Catatan Admin:</strong><br>
+                    <div class="bg-light p-2 rounded">${ticket.admin_note}</div>
+                </div>
+            ` : ''}
+            <div class="col-md-6">
                 <strong>Tanggal Dibuat:</strong><br>
                 ${formatDate(ticket.created_at)}
             </div>
+            <div class="col-md-6">
+                <strong>Terakhir Diupdate:</strong><br>
+                ${formatDate(ticket.updated_at)}
+            </div>
         </div>
     `;
-
-    // Setup action buttons
-    const reviewBtn = document.getElementById('btnReviewTicket');
-    const validateBtn = document.getElementById('btnValidateTicket');
-    const generateBtn = document.getElementById('btnGenerateTicket');
-    const rejectBtn = document.getElementById('btnRejectTicket');
-    
-    reviewBtn.onclick = () => updateTicketStatus(ticketId, 'in_review');
-    validateBtn.onclick = () => updateTicketStatus(ticketId, 'valid');
-    generateBtn.onclick = () => updateTicketStatus(ticketId, 'generated');
-    rejectBtn.onclick = () => updateTicketStatus(ticketId, 'rejected');
-    
-    // Show appropriate buttons based on status
-    reviewBtn.style.display = ticket.status === 'submitted' ? 'inline-block' : 'none';
-    validateBtn.style.display = ticket.status === 'in_review' ? 'inline-block' : 'none';
-    generateBtn.style.display = ticket.status === 'valid' ? 'inline-block' : 'none';
-    rejectBtn.style.display = ticket.status !== 'rejected' && ticket.status !== 'generated' ? 'inline-block' : 'none';
 
     const modal = new bootstrap.Modal(document.getElementById('ticketDetailModal'));
     modal.show();

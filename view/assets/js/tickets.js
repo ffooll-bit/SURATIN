@@ -108,6 +108,13 @@ function cleanupTickets() {
     currentPage = 1;
     selectedTickets.clear();
     
+    // Reset select all checkbox
+    const selectAll = document.getElementById('selectAll');
+    if (selectAll) {
+        selectAll.checked = false;
+        selectAll.indeterminate = false;
+    }
+    
     // Close any open modals
     const modals = document.querySelectorAll('.modal');
     modals.forEach(modal => {
@@ -177,6 +184,9 @@ function renderTicketsTable() {
         `;
     } else {
         tbody.innerHTML = pageTickets.map(ticket => {
+            // Check if this ticket is selected
+            const isSelected = selectedTickets.has(ticket.id);
+            
             // Generate action buttons based on status
             let actionButtons = `
                 <button class="btn btn-sm btn-outline-primary" onclick="showTicketDetail(${ticket.id})" title="Lihat Detail">
@@ -219,7 +229,8 @@ function renderTicketsTable() {
                 <tr>
                     <td class="text-center">
                         <input type="checkbox" class="form-check-input ticket-checkbox" 
-                               value="${ticket.id}" onchange="toggleTicketSelection(${ticket.id})">
+                               value="${ticket.id}" onchange="toggleTicketSelection(${ticket.id})"
+                               ${isSelected ? 'checked' : ''}>
                     </td>
                     <td>
                         <strong>${ticket.ticket_number}</strong>
@@ -252,6 +263,9 @@ function renderTicketsTable() {
     // Update pagination
     renderPagination();
     updateCounters();
+    
+    // Update select all state after rendering
+    updateSelectAllState();
 }
 
 function renderPagination() {
@@ -348,6 +362,14 @@ function applyFilters() {
         }
     });
 
+    // Clean up selections that are no longer in filtered results
+    const filteredTicketIds = new Set(filteredTickets.map(t => t.id));
+    selectedTickets.forEach(ticketId => {
+        if (!filteredTicketIds.has(ticketId)) {
+            selectedTickets.delete(ticketId);
+        }
+    });
+
     currentPage = 1;
     renderTicketsTable();
 }
@@ -360,12 +382,12 @@ function clearFilters() {
     document.getElementById('sortFilter').value = 'created_desc';
     
     filteredTickets = [...ticketsData];
+    
+    // Clear selections when clearing filters
+    selectedTickets.clear();
+    
     currentPage = 1;
     renderTicketsTable();
-}
-
-function refreshTickets() {
-    loadTicketsData();
 }
 
 // Helper functions
@@ -416,16 +438,22 @@ function formatDate(dateString) {
 // Ticket selection functions
 function toggleSelectAll() {
     const selectAll = document.getElementById('selectAll');
-    const checkboxes = document.querySelectorAll('.ticket-checkbox');
     
+    if (selectAll.checked) {
+        // Select all tickets across all pages
+        filteredTickets.forEach(ticket => {
+            selectedTickets.add(ticket.id);
+        });
+    } else {
+        // Deselect all tickets
+        selectedTickets.clear();
+    }
+    
+    // Update checkboxes on current page
+    const checkboxes = document.querySelectorAll('.ticket-checkbox');
     checkboxes.forEach(checkbox => {
-        checkbox.checked = selectAll.checked;
         const ticketId = parseInt(checkbox.value);
-        if (selectAll.checked) {
-            selectedTickets.add(ticketId);
-        } else {
-            selectedTickets.delete(ticketId);
-        }
+        checkbox.checked = selectedTickets.has(ticketId);
     });
     
     updateBulkActions();
@@ -440,26 +468,28 @@ function toggleTicketSelection(ticketId) {
         selectedTickets.delete(ticketId);
     }
     
-    // Update select all checkbox
-    const checkboxes = document.querySelectorAll('.ticket-checkbox');
-    const checkedBoxes = document.querySelectorAll('.ticket-checkbox:checked');
-    const selectAll = document.getElementById('selectAll');
-    
-    selectAll.indeterminate = checkedBoxes.length > 0 && checkedBoxes.length < checkboxes.length;
-    selectAll.checked = checkboxes.length > 0 && checkedBoxes.length === checkboxes.length;
-    
+    updateSelectAllState();
     updateBulkActions();
 }
 
-function updateBulkActions() {
-    const bulkCard = document.getElementById('bulkActionsCard');
-    const selectedCount = document.getElementById('selectedCount');
+function updateSelectAllState() {
+    const selectAll = document.getElementById('selectAll');
+    if (!selectAll) return;
     
-    if (selectedTickets.size > 0) {
-        bulkCard.style.display = 'block';
-        selectedCount.textContent = selectedTickets.size;
+    const totalFilteredTickets = filteredTickets.length;
+    const selectedFilteredTickets = filteredTickets.filter(ticket => 
+        selectedTickets.has(ticket.id)
+    ).length;
+    
+    if (selectedFilteredTickets === 0) {
+        selectAll.checked = false;
+        selectAll.indeterminate = false;
+    } else if (selectedFilteredTickets === totalFilteredTickets) {
+        selectAll.checked = true;
+        selectAll.indeterminate = false;
     } else {
-        bulkCard.style.display = 'none';
+        selectAll.checked = false;
+        selectAll.indeterminate = true;
     }
 }
 

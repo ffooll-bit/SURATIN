@@ -282,7 +282,7 @@ function renderPagination() {
     // Previous button
     paginationHTML += `
         <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-            <a class="page-link" href="#" onclick="changePage(${currentPage - 1})">
+            <a class="page-link" href="#" onclick="event.preventDefault(); changePage(${currentPage - 1})">
                 <i class="bi bi-chevron-left"></i>
             </a>
         </li>
@@ -293,7 +293,7 @@ function renderPagination() {
         if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
             paginationHTML += `
                 <li class="page-item ${i === currentPage ? 'active' : ''}">
-                    <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
+                    <a class="page-link" href="#" onclick="event.preventDefault(); changePage(${i})">${i}</a>
                 </li>
             `;
         } else if (i === currentPage - 3 || i === currentPage + 3) {
@@ -304,7 +304,7 @@ function renderPagination() {
     // Next button
     paginationHTML += `
         <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-            <a class="page-link" href="#" onclick="changePage(${currentPage + 1})">
+            <a class="page-link" href="#" onclick="event.preventDefault(); changePage(${currentPage + 1})">
                 <i class="bi bi-chevron-right"></i>
             </a>
         </li>

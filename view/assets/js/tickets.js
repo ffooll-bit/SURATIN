@@ -579,6 +579,20 @@ async function saveTicket() {
 }
 
 async function updateTicketStatus(ticketId, newStatus) {
+    // Get confirmation message based on status
+    const statusMessages = {
+        'in_review': 'Yakin ingin memindahkan ticket ini ke status "In Review"?',
+        'valid': 'Yakin ingin menandai ticket ini sebagai "Valid"?',
+        'rejected': 'Yakin ingin menolak ticket ini? Status akan berubah menjadi "Rejected".',
+        'generated': 'Yakin ingin generate surat untuk ticket ini?'
+    };
+    
+    const confirmMessage = statusMessages[newStatus] || `Yakin ingin mengubah status ticket ini menjadi "${getStatusName(newStatus)}"?`;
+    
+    if (!confirm(confirmMessage)) {
+        return;
+    }
+    
     try {
         const response = await fetch(`controller/api/tickets.php?id=${ticketId}`, {
             method: 'PATCH',
@@ -648,7 +662,17 @@ async function deleteTicket(ticketId) {
 async function bulkUpdateStatus(newStatus) {
     if (selectedTickets.size === 0) return;
     
-    if (!confirm(`Yakin ingin mengubah status ${selectedTickets.size} tickets?`)) return;
+    // Enhanced confirmation message for bulk operations
+    const statusMessages = {
+        'in_review': `Yakin ingin memindahkan ${selectedTickets.size} tickets ke status "In Review"?`,
+        'valid': `Yakin ingin menandai ${selectedTickets.size} tickets sebagai "Valid"?`,
+        'rejected': `Yakin ingin menolak ${selectedTickets.size} tickets? Status akan berubah menjadi "Rejected".`,
+        'generated': `Yakin ingin generate surat untuk ${selectedTickets.size} tickets?`
+    };
+    
+    const confirmMessage = statusMessages[newStatus] || `Yakin ingin mengubah status ${selectedTickets.size} tickets menjadi "${getStatusName(newStatus)}"?`;
+    
+    if (!confirm(confirmMessage)) return;
     
     try {
         const ticketIds = Array.from(selectedTickets);

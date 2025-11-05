@@ -226,11 +226,11 @@ function timeAgo($datetime) {
  */
 function getStatusInfo($status) {
     $statusMap = [
-        'submitted' => ['icon' => 'bi-plus-circle', 'color' => 'primary'],
-        'in_review' => ['icon' => 'bi-eye', 'color' => 'warning'],
+        'submitted' => ['icon' => 'bi-file-earmark-plus', 'color' => 'info'],
+        'in_review' => ['icon' => 'bi-hourglass-split', 'color' => 'warning'],
         'valid' => ['icon' => 'bi-check-circle', 'color' => 'success'],
         'rejected' => ['icon' => 'bi-x-circle', 'color' => 'danger'],
-        'generated' => ['icon' => 'bi-file-check', 'color' => 'success']
+        'generated' => ['icon' => 'bi-file-earmark-check', 'color' => 'primary']
     ];
     
     return $statusMap[$status] ?? ['icon' => 'bi-circle', 'color' => 'secondary'];

@@ -5,13 +5,19 @@
 // Dashboard-specific functions
 function reviewPendingTickets() {
     showSection('tickets');
-    const statusFilter = document.getElementById('statusFilter');
-    if (statusFilter) {
-        statusFilter.value = 'in_review';
-        if (typeof filterTickets === 'function') {
-            filterTickets();
+    
+    // Wait for the section to be fully loaded before applying filter
+    setTimeout(() => {
+        const statusFilter = document.getElementById('statusFilter');
+        if (statusFilter) {
+            statusFilter.value = 'submitted';
+            
+            // Apply filters using the correct function name from tickets.js
+            if (typeof applyFilters === 'function') {
+                applyFilters();
+            }
         }
-    }
+    }, 500);
 }
 
 function generateReports() {
@@ -168,7 +174,7 @@ function renderAllActivity(activities, pagination) {
     container.innerHTML = activities.map((activity, index) => `
         <div class="list-group-item d-flex align-items-center border-0 ${index > 0 ? 'border-top' : ''}">
             <div class="me-3">
-                <div class="bg-${activity.color} bg-opacity-10 rounded-circle p-2">
+                <div class="bg-${activity.color} bg-opacity-10 rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
                     <i class="bi ${activity.icon} text-${activity.color}"></i>
                 </div>
             </div>
@@ -357,7 +363,7 @@ function loadDashboardStats() {
 
 function showStatsLoading() {
     const loadingHTML = '<div class="spinner-border spinner-border-sm text-muted"></div>';
-    ['totalTickets', 'pendingTickets', 'completedTickets', 'weeklyTickets'].forEach(id => {
+    ['totalTickets', 'submittedTickets', 'inReviewTickets', 'generatedTickets'].forEach(id => {
         const element = document.getElementById(id);
         if (element) {
             element.innerHTML = loadingHTML;
@@ -368,9 +374,9 @@ function showStatsLoading() {
 function updateStatsElements(stats) {
     // Animate numbers counting up
     animateCounter('totalTickets', stats.total_tickets);
-    animateCounter('pendingTickets', stats.pending_tickets);
-    animateCounter('completedTickets', stats.completed_tickets);
-    animateCounter('weeklyTickets', stats.weekly_tickets);
+    animateCounter('submittedTickets', stats.breakdown.submitted);
+    animateCounter('inReviewTickets', stats.breakdown.in_review);
+    animateCounter('generatedTickets', stats.breakdown.generated);
 }
 
 function animateCounter(elementId, targetValue) {
@@ -401,7 +407,7 @@ function animateCounter(elementId, targetValue) {
 }
 
 function showStatsError() {
-    ['totalTickets', 'pendingTickets', 'completedTickets', 'weeklyTickets'].forEach(id => {
+    ['totalTickets', 'submittedTickets', 'inReviewTickets', 'generatedTickets'].forEach(id => {
         const element = document.getElementById(id);
         if (element) {
             element.innerHTML = '<span class="text-danger">--</span>';
@@ -516,7 +522,7 @@ function updateRecentActivity(activities) {
     container.innerHTML = activities.map(activity => `
         <div class="list-group-item d-flex align-items-center border-0">
             <div class="me-3">
-                <div class="bg-${activity.color} bg-opacity-10 rounded-circle p-2">
+                <div class="bg-${activity.color} bg-opacity-10 rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
                     <i class="bi ${activity.icon} text-${activity.color}"></i>
                 </div>
             </div>

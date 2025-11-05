@@ -362,13 +362,9 @@ function applyFilters() {
         }
     });
 
-    // Clean up selections that are no longer in filtered results
-    const filteredTicketIds = new Set(filteredTickets.map(t => t.id));
-    selectedTickets.forEach(ticketId => {
-        if (!filteredTicketIds.has(ticketId)) {
-            selectedTickets.delete(ticketId);
-        }
-    });
+    // Clear all selections when applying filters
+    selectedTickets.clear();
+    updateBulkActions();
 
     currentPage = 1;
     renderTicketsTable();
@@ -385,9 +381,17 @@ function clearFilters() {
     
     // Clear selections when clearing filters
     selectedTickets.clear();
+    updateBulkActions();
     
     currentPage = 1;
     renderTicketsTable();
+}
+
+function refreshTickets() {
+    // Clear selections when refreshing
+    selectedTickets.clear();
+    updateBulkActions();
+    loadTicketsData();
 }
 
 // Helper functions
@@ -490,6 +494,18 @@ function updateSelectAllState() {
     } else {
         selectAll.checked = false;
         selectAll.indeterminate = true;
+    }
+}
+
+function updateBulkActions() {
+    const bulkCard = document.getElementById('bulkActionsCard');
+    const selectedCount = document.getElementById('selectedCount');
+    
+    if (selectedTickets.size > 0) {
+        if (bulkCard) bulkCard.style.display = 'block';
+        if (selectedCount) selectedCount.textContent = selectedTickets.size;
+    } else {
+        if (bulkCard) bulkCard.style.display = 'none';
     }
 }
 

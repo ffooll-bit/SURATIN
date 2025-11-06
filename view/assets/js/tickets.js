@@ -853,7 +853,13 @@ function exportTickets(format) {
         date: document.getElementById('dateFilter').value
     });
     
-    window.open(`controller/api/export-tickets.php?${params.toString()}`, '_blank');
+    if (format === 'csv') {
+        // For CSV, direct download
+        window.location.href = `controller/api/export-tickets.php?${params.toString()}`;
+    } else if (format === 'pdf') {
+        // For PDF, open in new window for printing
+        window.open(`controller/api/export-tickets.php?${params.toString()}`, '_blank');
+    }
 }
 
 // Utility function to show alerts

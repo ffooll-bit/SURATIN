@@ -66,10 +66,13 @@ try {
                     if (!empty($statusFilter)) {
                         $filters['status'] = $statusFilter;
                     }
+
+                    // Order by updated_at descending
+                    $orderBy = 'updated_at DESC';
                     
                     // Get paginated tickets
-                    $result = $ticketModel->getAll($filters, $page, $limit);
-                    
+                    $result = $ticketModel->getAll($filters, $page, $limit, $orderBy);
+
                     if ($result['success']) {
                         $formattedActivities = [];
                         foreach ($result['data'] as $ticket) {

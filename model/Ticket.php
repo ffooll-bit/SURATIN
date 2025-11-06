@@ -132,7 +132,7 @@ class Ticket {
     /**
      * Get tickets with filters and pagination
      */
-    public function getAll($filters = [], $page = 1, $limit = 10) {
+    public function getAll($filters = [], $page = 1, $limit = 10, $orderBy = 'created_at DESC') {
         try {
             $offset = ($page - 1) * $limit;
             $whereConditions = [];
@@ -179,7 +179,7 @@ class Ticket {
             $query = "
                 SELECT * FROM tickets 
                 {$whereClause} 
-                ORDER BY created_at DESC 
+                ORDER BY {$orderBy}
                 LIMIT {$limit} OFFSET {$offset}
             ";
             

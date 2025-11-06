@@ -558,18 +558,19 @@ async function showTicketDetail(ticketId) {
             ${ticket.logs && ticket.logs.length > 0 ? `
                 <div class="col-12">
                     <strong>Riwayat Status:</strong><br>
-                    <div class="timeline mt-2">
+                    <div class="mt-2">
                         ${ticket.logs.map(log => `
-                            <div class="timeline-item">
-                                <div class="timeline-marker ${getStatusClass(log.action)}"></div>
-                                <div class="timeline-content">
-                                    <div class="d-flex justify-content-between">
-                                        <strong>${log.action_label}</strong>
-                                        <small class="text-muted">${log.formatted_date}</small>
+                            <div class="border rounded p-2 mb-1" style="background-color: #f8f9fa;">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge ${getStatusClass(log.action)} me-2">
+                                            ${getStatusName(log.action)}
+                                        </span>
                                     </div>
-                                    ${log.note ? `<div class="text-muted mt-1">${log.note}</div>` : ''}
-                                    ${log.admin_name ? `<div class="text-muted mt-1"><small>oleh ${log.admin_name}</small></div>` : (log.action === 'submitted' ? `<div class="text-muted mt-1"><small>oleh Sistem</small></div>` : '')}
+                                    <small class="text-muted">${log.formatted_date}</small>
                                 </div>
+                                ${log.note ? `<div class="text-muted mb-1" style="font-style: italic; padding-left: 15px; font-size: 0.9em;">${log.note}</div>` : ''}
+                                ${log.admin_name ? `<div class="text-muted" style="padding-left: 15px;"><small><i class="bi bi-person me-1"></i>by ${log.admin_name}</small></div>` : (log.action === 'submitted' ? `<div class="text-muted" style="padding-left: 15px;"><small><i class="bi bi-gear me-1"></i>by Sistem</small></div>` : '')}
                             </div>
                         `).join('')}
                     </div>

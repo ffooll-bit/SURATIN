@@ -555,10 +555,24 @@ async function showTicketDetail(ticketId) {
                     <pre class="bg-light p-2 rounded">${JSON.stringify(ticket.data, null, 2)}</pre>
                 </div>
             ` : ''}
-            ${ticket.admin_note ? `
+            ${ticket.logs && ticket.logs.length > 0 ? `
                 <div class="col-12">
-                    <strong>Catatan Admin:</strong><br>
-                    <div class="bg-light p-2 rounded">${ticket.admin_note}</div>
+                    <strong>Riwayat Status:</strong><br>
+                    <div class="timeline mt-2">
+                        ${ticket.logs.map(log => `
+                            <div class="timeline-item">
+                                <div class="timeline-marker ${getStatusClass(log.action)}"></div>
+                                <div class="timeline-content">
+                                    <div class="d-flex justify-content-between">
+                                        <strong>${log.action_label}</strong>
+                                        <small class="text-muted">${log.formatted_date}</small>
+                                    </div>
+                                    ${log.note ? `<div class="text-muted mt-1">${log.note}</div>` : ''}
+                                    ${log.admin_name ? `<div class="text-muted mt-1"><small>oleh ${log.admin_name}</small></div>` : (log.action === 'submitted' ? `<div class="text-muted mt-1"><small>oleh Sistem</small></div>` : '')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
                 </div>
             ` : ''}
             <div class="col-md-6">
@@ -639,13 +653,35 @@ async function updateTicketStatus(ticketId, newStatus) {
         return;
     }
     
+    // Ask for optional note
+    let note = null;
+    if (newStatus === 'rejected') {
+        note = prompt('Silakan masukkan alasan penolakan:');
+        if (note === null) {
+            return; // User cancelled
+        }
+    } else {
+        const addNote = confirm('Apakah Anda ingin menambahkan catatan untuk perubahan status ini?');
+        if (addNote) {
+            note = prompt('Masukkan catatan (opsional):');
+            if (note === null) {
+                return; // User cancelled
+            }
+        }
+    }
+    
     try {
+        const requestBody = { status: newStatus };
+        if (note && note.trim()) {
+            requestBody.note = note.trim();
+        }
+        
         const response = await fetch(`controller/api/tickets.php?id=${ticketId}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ status: newStatus })
+            body: JSON.stringify(requestBody)
         });
 
         const result = await response.json();
@@ -720,18 +756,40 @@ async function bulkUpdateStatus(newStatus) {
     
     if (!confirm(confirmMessage)) return;
     
+    // Ask for optional note for bulk update
+    let note = null;
+    if (newStatus === 'rejected') {
+        note = prompt('Silakan masukkan alasan penolakan untuk semua tickets yang dipilih:');
+        if (note === null) {
+            return; // User cancelled
+        }
+    } else {
+        const addNote = confirm('Apakah Anda ingin menambahkan catatan untuk semua tickets yang dipilih?');
+        if (addNote) {
+            note = prompt('Masukkan catatan (opsional):');
+            if (note === null) {
+                return; // User cancelled
+            }
+        }
+    }
+    
     try {
         const ticketIds = Array.from(selectedTickets);
+        const requestBody = { 
+            ids: ticketIds,
+            status: newStatus 
+        };
+        
+        if (note && note.trim()) {
+            requestBody.note = note.trim();
+        }
         
         const response = await fetch('controller/api/tickets.php', {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ 
-                ids: ticketIds,
-                status: newStatus 
-            })
+            body: JSON.stringify(requestBody)
         });
 
         const result = await response.json();

@@ -51,9 +51,12 @@ try {
             $result = $ticketModel->getAll($filters, $page, $limit);
             
             if ($result['success']) {
-                // Transform data to match expected API format
+                // Transform data to match expected API format and include logs
                 $transformedData = [];
                 foreach ($result['data'] as $ticket) {
+                    // Get logs for this ticket
+                    $ticketLogs = $ticketModel->ticketLog->getTicketTimeline($ticket['id']);
+                    
                     $transformedData[] = [
                         'id' => $ticket['id'],
                         'ticket_number' => $ticket['ticket_code'],
@@ -66,7 +69,7 @@ try {
                         'data' => is_string($ticket['data']) ? json_decode($ticket['data'], true) : $ticket['data'],
                         'attachments' => is_string($ticket['attachments']) ? json_decode($ticket['attachments'], true) : $ticket['attachments'],
                         'status' => $ticket['status'],
-                        'admin_note' => $ticket['admin_note'],
+                        'logs' => $ticketLogs,
                         'created_at' => $ticket['created_at'],
                         'updated_at' => $ticket['updated_at']
                     ];
@@ -119,8 +122,7 @@ try {
                 'email' => $input['email'],
                 'wa' => $input['wa'] ?? null,
                 'data' => !empty($input['data']) ? json_encode($input['data']) : null,
-                'attachments' => !empty($input['attachments']) ? json_encode($input['attachments']) : null,
-                'admin_note' => $input['admin_note'] ?? null
+                'attachments' => !empty($input['attachments']) ? json_encode($input['attachments']) : null
             ];
             
             $result = $ticketModel->create($ticketData);
@@ -158,7 +160,22 @@ try {
                     throw new Exception('Invalid status');
                 }
                 
-                $result = $ticketModel->bulkUpdateStatus($ticketIds, $status);
+                // For bulk updates, we need to update each ticket individually to create logs
+                $adminId = $_SESSION['admin_id'] ?? 1;
+                $note = $input['note'] ?? null;
+                $successCount = 0;
+                
+                foreach ($ticketIds as $ticketId) {
+                    $result = $ticketModel->updateStatus($ticketId, $status, $adminId, $note);
+                    if ($result['success']) {
+                        $successCount++;
+                    }
+                }
+                
+                $result = [
+                    'success' => $successCount > 0,
+                    'affected_rows' => $successCount
+                ];
                 
                 if ($result['success']) {
                     echo json_encode([
@@ -185,12 +202,10 @@ try {
                     throw new Exception('Invalid status');
                 }
                 
-                $updateData = ['status' => $input['status']];
-                if (isset($input['admin_note'])) {
-                    $updateData['admin_note'] = $input['admin_note'];
-                }
+                $adminId = $_SESSION['admin_id'] ?? 1; // Get admin ID from session
+                $note = $input['note'] ?? null; // Use 'note' instead of 'admin_note'
                 
-                $result = $ticketModel->update($ticketId, $updateData);
+                $result = $ticketModel->updateStatus($ticketId, $input['status'], $adminId, $note);
                 
                 if ($result['success']) {
                     echo json_encode([

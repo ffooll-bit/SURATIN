@@ -7,7 +7,7 @@
 require_once __DIR__ . '/../controller/config/database.php';
 
 class TicketLog {
-    private $pdo;
+    public $pdo;
     
     public function __construct() {
         $this->pdo = getDbConnection();

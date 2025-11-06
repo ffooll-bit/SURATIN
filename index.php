@@ -187,7 +187,7 @@ switch ($page) {
                         <a class="nav-link" href="?page=status">Cek Status</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="?page=admin&action=login">Admin</a>
+                        <a class="nav-link" href="?page=admin">Admin</a>
                     </li>
                 </ul>
             </div>

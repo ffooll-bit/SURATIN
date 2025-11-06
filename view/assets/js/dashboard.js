@@ -189,7 +189,8 @@ function renderAllActivity(activities, pagination) {
                         ${activity.id ? `<small class="text-primary fw-medium" style="font-size: 0.7rem;">${activity.id}</small>` : ''}
                     </div>
                 </div>
-                ${activity.admin_note ? `<div class="mt-1"><small class="text-info"><i class="bi bi-sticky me-1"></i>${activity.admin_note}</small></div>` : ''}
+                ${activity.latest_note ? `<div class="mt-1"><small class="text-info"><i class="bi bi-sticky me-1"></i>${activity.latest_note}</small></div>` : ''}
+                ${activity.admin_name ? `<div class="mt-1"><small class="text-muted"><i class="bi bi-person me-1"></i>by ${activity.admin_name}</small></div>` : `<div class="mt-1"><small class="text-muted"><i class="bi bi-robot me-1"></i>by System</small></div>`}
             </div>
         </div>
     `).join('');
@@ -481,7 +482,7 @@ function showTodayActivityError(message) {
 function loadRecentActivity() {
     console.log('Loading recent activity...');
     
-    fetch('./controller/api/dashboard.php?action=activity&limit=5')
+    fetch('./controller/api/dashboard.php?action=recent_activity&limit=5')
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);

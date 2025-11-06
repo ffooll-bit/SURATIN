@@ -5,12 +5,15 @@
  */
 
 require_once __DIR__ . '/../controller/config/database.php';
+require_once __DIR__ . '/TicketLog.php';
 
 class Ticket {
     public $pdo; // Change from private to public for dashboard controller access
+    public $ticketLog; // Make public for API access
     
     public function __construct() {
         $this->pdo = getDbConnection();
+        $this->ticketLog = new TicketLog();
     }
     
     /**
@@ -69,10 +72,16 @@ class Ticket {
             ]);
             
             if ($result) {
+                $ticketId = $this->pdo->lastInsertId();
+                
+                // Create initial log entry for submission
+                // admin_id is NULL for initial submissions since no admin has handled it yet
+                $this->ticketLog->create($ticketId, null, 'submitted');
+                
                 return [
                     'success' => true,
                     'ticket_code' => $ticketCode,
-                    'id' => $this->pdo->lastInsertId()
+                    'id' => $ticketId
                 ];
             }
             
@@ -208,19 +217,37 @@ class Ticket {
     }
     
     /**
-     * Update ticket status
+     * Update ticket status and create log entry
      */
-    public function updateStatus($id, $status, $adminNote = null) {
+    public function updateStatus($id, $status, $adminId, $note = null) {
         try {
+            // Validate status
+            if (!$this->isValidStatus($status)) {
+                return ['success' => false, 'error' => 'Invalid status'];
+            }
+            
             $stmt = $this->pdo->prepare("
                 UPDATE tickets 
-                SET status = ?, admin_note = ?, updated_at = NOW() 
+                SET status = ?, updated_at = NOW() 
                 WHERE id = ?
             ");
             
-            $result = $stmt->execute([$status, $adminNote, $id]);
+            $result = $stmt->execute([$status, $id]);
             
-            return ['success' => $result];
+            if ($result) {
+                // Create log entry for this status change
+                $logResult = $this->ticketLog->create($id, $adminId, $status, $note);
+                
+                if (!$logResult['success']) {
+                    // Log creation failed, but ticket update succeeded
+                    // You might want to handle this differently based on requirements
+                    error_log('Failed to create ticket log: ' . $logResult['error']);
+                }
+                
+                return ['success' => true];
+            }
+            
+            return ['success' => false, 'error' => 'Failed to update ticket status'];
             
         } catch (PDOException $e) {
             return ['success' => false, 'error' => $e->getMessage()];
@@ -237,7 +264,7 @@ class Ticket {
             
             // Build dynamic update query
             foreach ($data as $field => $value) {
-                if (in_array($field, ['nama', 'npm', 'prodi', 'jenis_surat', 'email', 'wa', 'status', 'admin_note'])) {
+                if (in_array($field, ['nama', 'npm', 'prodi', 'jenis_surat', 'email', 'wa', 'status'])) {
                     $fields[] = "{$field} = ?";
                     $params[] = $value;
                 } elseif ($field === 'data' || $field === 'attachments') {
@@ -338,10 +365,26 @@ class Ticket {
         try {
             $stmt = $this->pdo->prepare("
                 SELECT 
-                    ticket_code, nama, jenis_surat, status, 
-                    admin_note, created_at, updated_at
-                FROM tickets 
-                ORDER BY updated_at DESC 
+                    t.ticket_code, 
+                    t.nama, 
+                    t.jenis_surat, 
+                    t.status, 
+                    t.created_at, 
+                    t.updated_at,
+                    tl.note as latest_note,
+                    tl.created_at as log_created_at,
+                    a.name as admin_name
+                FROM tickets t
+                LEFT JOIN ticket_logs tl ON (
+                    tl.ticket_id = t.id AND 
+                    tl.id = (
+                        SELECT MAX(id) 
+                        FROM ticket_logs 
+                        WHERE ticket_id = t.id
+                    )
+                )
+                LEFT JOIN admins a ON tl.admin_id = a.id
+                ORDER BY t.updated_at DESC 
                 LIMIT ?
             ");
             $stmt->execute([$limit]);
@@ -413,6 +456,36 @@ class Ticket {
             ];
         } catch (Exception $e) {
             return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+    
+    /**
+     * Get ticket by ID with logs
+     */
+    public function getByIdWithLogs($id) {
+        try {
+            $ticket = $this->getById($id);
+            if ($ticket) {
+                $ticket['logs'] = $this->ticketLog->getTicketTimeline($id);
+            }
+            return $ticket;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+    
+    /**
+     * Get ticket by ticket code with logs
+     */
+    public function getByTicketCodeWithLogs($ticketCode) {
+        try {
+            $ticket = $this->getByTicketCode($ticketCode);
+            if ($ticket) {
+                $ticket['logs'] = $this->ticketLog->getTicketTimeline($ticket['id']);
+            }
+            return $ticket;
+        } catch (Exception $e) {
+            return false;
         }
     }
     

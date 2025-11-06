@@ -190,7 +190,7 @@ function renderAllActivity(activities, pagination) {
                     </div>
                 </div>
                 ${activity.latest_note ? `<div class="mt-1"><small class="text-info"><i class="bi bi-sticky me-1"></i>${activity.latest_note}</small></div>` : ''}
-                ${activity.admin_name ? `<div class="mt-1"><small class="text-muted"><i class="bi bi-person me-1"></i>by ${activity.admin_name}</small></div>` : `<div class="mt-1"><small class="text-muted"><i class="bi bi-robot me-1"></i>by System</small></div>`}
+                ${activity.admin_name ? `<div class="mt-1"><small class="text-muted"><i class="bi bi-person me-1"></i>by ${activity.admin_name}</small></div>` : `<div class="mt-1"><small class="text-muted"><i class="bi bi-gear me-1"></i>by System</small></div>`}
             </div>
         </div>
     `).join('');

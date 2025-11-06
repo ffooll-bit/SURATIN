@@ -687,20 +687,14 @@ async function updateTicketStatus(ticketId, newStatus) {
         const result = await response.json();
         
         if (result.success) {
-            // Update local data
-            const ticket = ticketsData.find(t => t.id === ticketId);
-            if (ticket) {
-                ticket.status = newStatus;
-            }
-            
-            updateStatistics();
-            renderTicketsTable();
-            
             // Close detail modal if open
             const detailModal = bootstrap.Modal.getInstance(document.getElementById('ticketDetailModal'));
             if (detailModal) {
                 detailModal.hide();
             }
+            
+            // Refresh data from server
+            refreshTickets();
             
             showAlert('success', 'Status ticket berhasil diperbarui!');
         } else {
@@ -795,18 +789,11 @@ async function bulkUpdateStatus(newStatus) {
         const result = await response.json();
         
         if (result.success) {
-            // Update local data
-            ticketIds.forEach(id => {
-                const ticket = ticketsData.find(t => t.id === id);
-                if (ticket) {
-                    ticket.status = newStatus;
-                }
-            });
-            
             selectedTickets.clear();
-            updateStatistics();
-            renderTicketsTable();
             updateBulkActions();
+            
+            // Refresh data from server
+            refreshTickets();
             
             showAlert('success', `${ticketIds.length} tickets berhasil diperbarui!`);
         } else {

@@ -3,6 +3,7 @@ CREATE DATABASE IF NOT EXISTS suratin_db CHARACTER SET utf8mb4 COLLATE utf8mb4_u
 USE suratin_db;
 
 -- Drop tables if exists
+DROP TABLE IF EXISTS ticket_logs;
 DROP TABLE IF EXISTS tickets;
 DROP TABLE IF EXISTS admins;
 
@@ -39,7 +40,6 @@ CREATE TABLE tickets (
     email VARCHAR(255) NOT NULL,
     wa VARCHAR(30) DEFAULT NULL,
     status ENUM('submitted','in_review','valid','rejected','generated') DEFAULT 'submitted',
-    admin_note TEXT DEFAULT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
@@ -48,5 +48,25 @@ CREATE TABLE tickets (
     INDEX idx_status (status),
     INDEX idx_jenis_surat (jenis_surat),
     INDEX idx_npm (npm),
+    INDEX idx_created_at (created_at)
+) ENGINE=InnoDB;
+
+-- Create ticket_logs table
+CREATE TABLE ticket_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    ticket_id INT NOT NULL,
+    admin_id INT DEFAULT NULL,
+    action ENUM('submitted','in_review','valid','rejected','generated') NOT NULL,
+    note TEXT DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    
+    -- Foreign keys
+    FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE,
+    FOREIGN KEY (admin_id) REFERENCES admins(id) ON DELETE RESTRICT,
+    
+    -- Indexes
+    INDEX idx_ticket_id (ticket_id),
+    INDEX idx_admin_id (admin_id),
+    INDEX idx_action (action),
     INDEX idx_created_at (created_at)
 ) ENGINE=InnoDB;

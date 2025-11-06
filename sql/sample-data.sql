@@ -14,101 +14,185 @@ INSERT INTO admins (username, password_hash, name, email, role, active, last_log
 ('hrd_admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Admin HRD', 'hrd@universitas.ac.id', 'admin', 0, NULL, '2024-10-25 14:30:00', '2024-10-25 14:30:00');
 
 -- Insert sample data
-INSERT INTO tickets (ticket_code, nama, npm, prodi, jenis_surat, data, attachments, email, wa, status, admin_note, created_at, updated_at) VALUES
+INSERT INTO tickets (ticket_code, nama, npm, prodi, jenis_surat, data, attachments, email, wa, status, created_at, updated_at) VALUES
 
 -- Generated tickets (sudah selesai)
 ('TCK-20241029-0001', 'Muhammad Arif Rahman', '2023110001', 'Teknik Informatika', 'Surat Keterangan Aktif Kuliah', 
  '{"semester": "5", "tahun_akademik": "2024/2025", "keperluan": "Persyaratan beasiswa", "alamat": "Jl. Merdeka No. 15, Jakarta"}',
  '[{"name": "KTM.jpg", "path": "uploads/TCK-20241029-0001/KTM.jpg", "size": 245678}]',
- 'arif.rahman@student.univ.ac.id', '08123456789', 'generated', 'Surat telah dihasilkan dan dikirim via email', '2024-10-29 08:30:00', '2024-10-29 14:20:00'),
+ 'arif.rahman@student.univ.ac.id', '08123456789', 'generated', '2024-10-29 08:30:00', '2024-10-29 14:20:00'),
 
 ('TCK-20241028-0015', 'Siti Nurhaliza Putri', '2023110025', 'Sistem Informasi', 'Surat Pengantar Magang', 
  '{"nama_perusahaan": "PT. Teknologi Maju", "alamat_perusahaan": "Jl. Sudirman No. 45, Jakarta", "divisi": "IT Development", "durasi": "3 bulan", "periode": "Januari - Maret 2025"}',
  '[{"name": "Proposal_Magang.pdf", "path": "uploads/TCK-20241028-0015/Proposal_Magang.pdf", "size": 1234567}, {"name": "CV.pdf", "path": "uploads/TCK-20241028-0015/CV.pdf", "size": 567890}]',
- 'siti.nurhaliza@student.univ.ac.id', '08567891234', 'generated', NULL, '2024-10-28 10:15:00', '2024-10-28 16:45:00'),
+ 'siti.nurhaliza@student.univ.ac.id', '08567891234', 'generated', '2024-10-28 10:15:00', '2024-10-28 16:45:00'),
 
 ('TCK-20241025-0008', 'Budi Santoso Wijaya', '2023110045', 'Teknik Elektro', 'Surat Pengantar Penelitian', 
  '{"judul_penelitian": "Implementasi IoT pada Smart Home", "lokasi_penelitian": "PT. Smart Technology", "dosen_pembimbing": "Dr. Andi Wijaya, M.T.", "durasi": "2 bulan"}',
  '[{"name": "Proposal_Penelitian.pdf", "path": "uploads/TCK-20241025-0008/Proposal_Penelitian.pdf", "size": 2345678}]',
- 'budi.santoso@student.univ.ac.id', '08765432109', 'generated', 'Penelitian disetujui', '2024-10-25 09:20:00', '2024-10-25 15:30:00'),
+ 'budi.santoso@student.univ.ac.id', '08765432109', 'generated', '2024-10-25 09:20:00', '2024-10-25 15:30:00'),
 
 -- Valid tickets (sudah disetujui, menunggu generate)
 ('TCK-20241027-0012', 'Lisa Permatasari', '2023110067', 'Manajemen', 'Surat Rekomendasi', 
  '{"keperluan": "Pendaftaran S2", "universitas_tujuan": "Universitas Indonesia", "program_studi": "Magister Manajemen", "ipk": "3.75"}',
  '[{"name": "Transkrip_Nilai.pdf", "path": "uploads/TCK-20241027-0012/Transkrip_Nilai.pdf", "size": 890123}, {"name": "Sertifikat_Prestasi.pdf", "path": "uploads/TCK-20241027-0012/Sertifikat_Prestasi.pdf", "size": 456789}]',
- 'lisa.permata@student.univ.ac.id', '08234567890', 'valid', 'Data lengkap, siap generate surat', '2024-10-27 11:45:00', '2024-10-29 09:15:00'),
+ 'lisa.permata@student.univ.ac.id', '08234567890', 'valid', '2024-10-27 11:45:00', '2024-10-29 09:15:00'),
 
 ('TCK-20241026-0005', 'Andi Kurniawan', '2023110089', 'Akuntansi', 'Surat Keterangan Aktif Kuliah', 
  '{"semester": "7", "tahun_akademik": "2024/2025", "keperluan": "Persyaratan KKN", "alamat": "Jl. Pahlawan No. 23, Bandung"}',
  '[{"name": "KTM_Andi.jpg", "path": "uploads/TCK-20241026-0005/KTM_Andi.jpg", "size": 198765}]',
- 'andi.kurnia@student.univ.ac.id', '08345678901', 'valid', NULL, '2024-10-26 13:10:00', '2024-10-26 16:20:00'),
+ 'andi.kurnia@student.univ.ac.id', '08345678901', 'valid', '2024-10-26 13:10:00', '2024-10-26 16:20:00'),
 
 -- In Review tickets (sedang direview admin)
 ('TCK-20241029-0018', 'Maya Sari Dewi', '2023110012', 'Psikologi', 'Surat Pengantar Magang', 
  '{"nama_perusahaan": "Rumah Sakit Jiwa Daerah", "alamat_perusahaan": "Jl. Kesehatan No. 12, Surabaya", "divisi": "Psikologi Klinis", "durasi": "4 bulan", "periode": "Februari - Mei 2025"}',
  '[{"name": "Surat_Penerimaan_RS.pdf", "path": "uploads/TCK-20241029-0018/Surat_Penerimaan_RS.pdf", "size": 1456789}]',
- 'maya.sari@student.univ.ac.id', '08456789012', 'in_review', NULL, '2024-10-29 14:30:00', '2024-10-29 14:30:00'),
+ 'maya.sari@student.univ.ac.id', '08456789012', 'in_review', '2024-10-29 14:30:00', '2024-10-29 14:30:00'),
 
 ('TCK-20241029-0017', 'Roni Hermawan', '2023110034', 'Teknik Mesin', 'Surat Keterangan Aktif Kuliah', 
  '{"semester": "3", "tahun_akademik": "2024/2025", "keperluan": "Pendaftaran Part Time Job", "alamat": "Jl. Veteran No. 8, Yogyakarta"}',
  '[{"name": "KTM_Roni.png", "path": "uploads/TCK-20241029-0017/KTM_Roni.png", "size": 287654}]',
- 'roni.hermawan@student.univ.ac.id', '08567890123', 'in_review', NULL, '2024-10-29 13:15:00', '2024-10-29 13:15:00'),
+ 'roni.hermawan@student.univ.ac.id', '08567890123', 'in_review', '2024-10-29 13:15:00', '2024-10-29 13:15:00'),
 
 -- Submitted tickets (baru disubmit, belum direview)
 ('TCK-20241030-0021', 'Devi Kartika Sari', '2023110056', 'Farmasi', 'Surat Pengantar Penelitian', 
  '{"judul_penelitian": "Analisis Kandungan Obat Herbal Tradisional", "lokasi_penelitian": "BPOM Daerah", "dosen_pembimbing": "Dr. Sari Wijayanti, M.Farm.", "durasi": "3 bulan"}',
  '[{"name": "Proposal_Penelitian_Farmasi.pdf", "path": "uploads/TCK-20241030-0021/Proposal_Penelitian_Farmasi.pdf", "size": 3456789}, {"name": "Surat_Izin_BPOM.pdf", "path": "uploads/TCK-20241030-0021/Surat_Izin_BPOM.pdf", "size": 1234567}]',
- 'devi.kartika@student.univ.ac.id', '08678901234', 'submitted', NULL, '2024-10-30 09:45:00', '2024-10-30 09:45:00'),
+ 'devi.kartika@student.univ.ac.id', '08678901234', 'submitted', '2024-10-30 09:45:00', '2024-10-30 09:45:00'),
 
 ('TCK-20241030-0020', 'Agus Setiawan', '2023110078', 'Ekonomi', 'Surat Rekomendasi', 
  '{"keperluan": "Beasiswa LPDP", "program": "S2 Ekonomi Pembangunan", "universitas_tujuan": "Universitas Gadjah Mada", "ipk": "3.82"}',
  '[{"name": "Transkrip_IPK.pdf", "path": "uploads/TCK-20241030-0020/Transkrip_IPK.pdf", "size": 765432}, {"name": "Essay_LPDP.pdf", "path": "uploads/TCK-20241030-0020/Essay_LPDP.pdf", "size": 2345678}]',
- 'agus.setiawan@student.univ.ac.id', '08789012345', 'submitted', NULL, '2024-10-30 08:20:00', '2024-10-30 08:20:00'),
+ 'agus.setiawan@student.univ.ac.id', '08789012345', 'submitted', '2024-10-30 08:20:00', '2024-10-30 08:20:00'),
 
 ('TCK-20241030-0019', 'Fitri Rahmawati', '2023110091', 'Hukum', 'Surat Keterangan Aktif Kuliah', 
  '{"semester": "5", "tahun_akademik": "2024/2025", "keperluan": "Persyaratan magang di firma hukum", "alamat": "Jl. Diponegoro No. 33, Semarang"}',
  '[{"name": "KHS_Semester_4.pdf", "path": "uploads/TCK-20241030-0019/KHS_Semester_4.pdf", "size": 432109}]',
- 'fitri.rahma@student.univ.ac.id', '08890123456', 'submitted', NULL, '2024-10-30 07:55:00', '2024-10-30 07:55:00'),
+ 'fitri.rahma@student.univ.ac.id', '08890123456', 'submitted', '2024-10-30 07:55:00', '2024-10-30 07:55:00'),
 
 -- Rejected tickets (ditolak dengan alasan)
 ('TCK-20241024-0003', 'Dedi Kurniawan', '2023110123', 'Teknik Sipil', 'Surat Pengantar Magang', 
  '{"nama_perusahaan": "PT. Konstruksi ABC", "alamat_perusahaan": "Jl. Pembangunan No. 17", "divisi": "Engineering", "durasi": "2 bulan"}',
  '[{"name": "CV_Lama.pdf", "path": "uploads/TCK-20241024-0003/CV_Lama.pdf", "size": 234567}]',
- 'dedi.kurnia@student.univ.ac.id', '08901234567', 'rejected', 'Dokumen proposal magang tidak lengkap. Mohon sertakan surat penerimaan dari perusahaan dan proposal yang lebih detail.', '2024-10-24 15:20:00', '2024-10-24 17:45:00'),
+ 'dedi.kurnia@student.univ.ac.id', '08901234567', 'rejected', '2024-10-24 15:20:00', '2024-10-24 17:45:00'),
 
 ('TCK-20241023-0007', 'Nina Puspitasari', '2022110045', 'Kedokteran', 'Surat Rekomendasi', 
  '{"keperluan": "Pendaftaran Residency", "program": "Spesialis Anak", "universitas_tujuan": "RSUP Dr. Sardjito", "ipk": "3.2"}',
  '[{"name": "Transkrip_Lama.pdf", "path": "uploads/TCK-20241023-0007/Transkrip_Lama.pdf", "size": 567890}]',
- 'nina.puspita@student.univ.ac.id', '08123450987', 'rejected', 'IPK belum memenuhi syarat minimum untuk surat rekomendasi program spesialis (min. 3.5). Silakan tingkatkan prestasi akademik terlebih dahulu.', '2024-10-23 10:30:00', '2024-10-23 14:15:00'),
+ 'nina.puspita@student.univ.ac.id', '08123450987', 'rejected', '2024-10-23 10:30:00', '2024-10-23 14:15:00'),
 
 -- Tickets dengan data yang lebih kompleks
 ('TCK-20241029-0016', 'Bayu Adi Pratama', '2023110199', 'Teknik Informatika', 'Surat Keterangan Aktif Kuliah', 
  '{"semester": "6", "tahun_akademik": "2024/2025", "keperluan": "Pendaftaran kompetisi programming internasional", "alamat": "Komplek Mahasiswa Blok A No. 15, Depok", "prestasi": ["Juara 1 Hackathon 2023", "Best Innovation Award 2024"]}',
  '[{"name": "KTM_Bayu.jpg", "path": "uploads/TCK-20241029-0016/KTM_Bayu.jpg", "size": 256789}, {"name": "Sertifikat_Juara.pdf", "path": "uploads/TCK-20241029-0016/Sertifikat_Juara.pdf", "size": 1234567}, {"name": "Portfolio_Project.pdf", "path": "uploads/TCK-20241029-0016/Portfolio_Project.pdf", "size": 5678901}]',
- 'bayu.adi@student.univ.ac.id', '08234567891', 'in_review', NULL, '2024-10-29 16:00:00', '2024-10-29 16:00:00'),
+ 'bayu.adi@student.univ.ac.id', '08234567891', 'in_review', '2024-10-29 16:00:00', '2024-10-29 16:00:00'),
 
 ('TCK-20241028-0014', 'Cindy Maharani', '2023110156', 'Desain Komunikasi Visual', 'Surat Pengantar Magang', 
  '{"nama_perusahaan": "Creative Agency Studio", "alamat_perusahaan": "Jl. Seniman No. 99, Bandung", "divisi": "Graphic Design & Branding", "durasi": "6 bulan", "periode": "Januari - Juni 2025", "project_focus": "UI/UX Design untuk mobile apps"}',
  '[{"name": "Portfolio_Design.pdf", "path": "uploads/TCK-20241028-0014/Portfolio_Design.pdf", "size": 15678901}, {"name": "Surat_Penerimaan_Agency.pdf", "path": "uploads/TCK-20241028-0014/Surat_Penerimaan_Agency.pdf", "size": 987654}]',
- 'cindy.maharani@student.univ.ac.id', '08345678902', 'valid', 'Portfolio sangat impressive, disetujui untuk magang', '2024-10-28 11:30:00', '2024-10-28 15:45:00'),
+ 'cindy.maharani@student.univ.ac.id', '08345678902', 'valid', '2024-10-28 11:30:00', '2024-10-28 15:45:00'),
 
 -- Additional sample data for more variety
 ('TCK-20241031-0025', 'Ahmad Fauzi', '2023110200', 'Teknik Informatika', 'Surat Keterangan Aktif Kuliah', 
  '{"semester": "4", "tahun_akademik": "2024/2025", "keperluan": "Pendaftaran beasiswa unggulan", "alamat": "Jl. Sudirman No. 78, Jakarta"}',
  '[{"name": "KTM_Ahmad.jpg", "path": "uploads/TCK-20241031-0025/KTM_Ahmad.jpg", "size": 234567}]',
- 'ahmad.fauzi@student.univ.ac.id', '08123456780', 'submitted', NULL, '2024-10-31 08:15:00', '2024-10-31 08:15:00'),
+ 'ahmad.fauzi@student.univ.ac.id', '08123456780', 'submitted', '2024-10-31 08:15:00', '2024-10-31 08:15:00'),
 
 ('TCK-20241031-0024', 'Diana Sari', '2023110201', 'Manajemen', 'Surat Pengantar Penelitian', 
  '{"judul_penelitian": "Analisis Strategi Marketing Digital UMKM", "lokasi_penelitian": "Dinas Koperasi dan UMKM", "dosen_pembimbing": "Dr. Budi Hartono, M.M.", "durasi": "4 bulan"}',
  '[{"name": "Proposal_Marketing.pdf", "path": "uploads/TCK-20241031-0024/Proposal_Marketing.pdf", "size": 2890123}]',
- 'diana.sari@student.univ.ac.id', '08234567891', 'in_review', NULL, '2024-10-31 09:30:00', '2024-10-31 09:30:00'),
+ 'diana.sari@student.univ.ac.id', '08234567891', 'in_review', '2024-10-31 09:30:00', '2024-10-31 09:30:00'),
 
 ('TCK-20241031-0023', 'Rizki Pratama', '2023110202', 'Akuntansi', 'Surat Rekomendasi', 
  '{"keperluan": "Pendaftaran Program Chartered Accountant", "program": "CA Indonesia", "universitas_tujuan": "IAI (Ikatan Akuntan Indonesia)", "ipk": "3.68"}',
  '[{"name": "Transkrip_CA.pdf", "path": "uploads/TCK-20241031-0023/Transkrip_CA.pdf", "size": 1234568}]',
- 'rizki.pratama@student.univ.ac.id', '08345678902', 'valid', 'IPK memenuhi syarat, dokumen lengkap', '2024-10-31 10:45:00', '2024-10-31 14:20:00'),
+ 'rizki.pratama@student.univ.ac.id', '08345678902', 'valid', '2024-10-31 10:45:00', '2024-10-31 14:20:00'),
 
 ('TCK-20241031-0022', 'Sari Indah', '2023110203', 'Psikologi', 'Surat Keterangan Aktif Kuliah', 
  '{"semester": "8", "tahun_akademik": "2024/2025", "keperluan": "Persyaratan wisuda", "alamat": "Jl. Gatot Subroto No. 45, Bandung"}',
  '[{"name": "KRS_Terakhir.pdf", "path": "uploads/TCK-20241031-0022/KRS_Terakhir.pdf", "size": 567891}]',
- 'sari.indah@student.univ.ac.id', '08456789013', 'generated', 'Surat untuk wisuda telah diterbitkan', '2024-10-31 11:00:00', '2024-10-31 16:30:00');
+ 'sari.indah@student.univ.ac.id', '08456789013', 'generated', '2024-10-31 11:00:00', '2024-10-31 16:30:00');
+
+-- Insert sample ticket logs
+INSERT INTO ticket_logs (ticket_id, admin_id, action, note, created_at) VALUES
+-- Logs for ticket ID 1 (Muhammad Arif Rahman) - Generated ticket
+(1, NULL, 'submitted', NULL, '2024-10-29 08:30:00'),
+(1, 2, 'in_review', 'Memeriksa kelengkapan dokumen', '2024-10-29 10:15:00'),
+(1, 2, 'valid', 'Dokumen lengkap dan memenuhi syarat', '2024-10-29 12:30:00'),
+(1, 1, 'generated', 'Surat telah dihasilkan dan dikirim via email', '2024-10-29 14:20:00'),
+
+-- Logs for ticket ID 2 (Siti Nurhaliza Putri) - Generated ticket  
+(2, NULL, 'submitted', NULL, '2024-10-28 10:15:00'),
+(2, 3, 'in_review', 'Meninjau proposal magang', '2024-10-28 11:00:00'),
+(2, 3, 'valid', 'Proposal magang disetujui', '2024-10-28 14:30:00'),
+(2, 1, 'generated', 'Surat pengantar magang telah diterbitkan', '2024-10-28 16:45:00'),
+
+-- Logs for ticket ID 3 (Budi Santoso Wijaya) - Generated ticket
+(3, NULL, 'submitted', NULL, '2024-10-25 09:20:00'),
+(3, 2, 'in_review', 'Reviewing research proposal', '2024-10-25 10:45:00'),
+(3, 2, 'valid', 'Penelitian disetujui', '2024-10-25 13:15:00'),
+(3, 1, 'generated', 'Surat pengantar penelitian telah dikeluarkan', '2024-10-25 15:30:00'),
+
+-- Logs for ticket ID 4 (Lisa Permatasari) - Valid ticket
+(4, NULL, 'submitted', NULL, '2024-10-27 11:45:00'),
+(4, 2, 'in_review', 'Memverifikasi data akademik', '2024-10-28 09:00:00'),
+(4, 2, 'valid', 'Data lengkap, siap generate surat', '2024-10-29 09:15:00'),
+
+-- Logs for ticket ID 5 (Andi Kurniawan) - Valid ticket
+(5, NULL, 'submitted', NULL, '2024-10-26 13:10:00'),
+(5, 3, 'in_review', 'Checking student status', '2024-10-26 14:20:00'),
+(5, 3, 'valid', 'Status mahasiswa aktif confirmed', '2024-10-26 16:20:00'),
+
+-- Logs for ticket ID 6 (Maya Sari Dewi) - In Review
+(6, NULL, 'submitted', NULL, '2024-10-29 14:30:00'),
+(6, 4, 'in_review', 'Sedang memverifikasi dokumen magang RS', '2024-10-29 15:45:00'),
+
+-- Logs for ticket ID 7 (Roni Hermawan) - In Review
+(7, NULL, 'submitted', NULL, '2024-10-29 13:15:00'),
+(7, 2, 'in_review', 'Mengecek kelengkapan untuk part time job', '2024-10-29 14:30:00'),
+
+-- Logs for ticket ID 8 (Devi Kartika Sari) - Submitted
+(8, NULL, 'submitted', NULL, '2024-10-30 09:45:00'),
+
+-- Logs for ticket ID 9 (Agus Setiawan) - Submitted
+(9, NULL, 'submitted', NULL, '2024-10-30 08:20:00'),
+
+-- Logs for ticket ID 10 (Fitri Rahmawati) - Submitted
+(10, NULL, 'submitted', NULL, '2024-10-30 07:55:00'),
+
+-- Logs for ticket ID 11 (Dedi Kurniawan) - Rejected ticket
+(11, NULL, 'submitted', NULL, '2024-10-24 15:20:00'),
+(11, 2, 'in_review', 'Meninjau dokumen proposal magang', '2024-10-24 16:00:00'),
+(11, 2, 'rejected', 'Dokumen proposal magang tidak lengkap. Mohon sertakan surat penerimaan dari perusahaan dan proposal yang lebih detail.', '2024-10-24 17:45:00'),
+
+-- Logs for ticket ID 12 (Nina Puspitasari) - Rejected ticket
+(12, NULL, 'submitted', NULL, '2024-10-23 10:30:00'),
+(12, 3, 'in_review', 'Memeriksa persyaratan IPK untuk program spesialis', '2024-10-23 11:15:00'),
+(12, 3, 'rejected', 'IPK belum memenuhi syarat minimum untuk surat rekomendasi program spesialis (min. 3.5). Silakan tingkatkan prestasi akademik terlebih dahulu.', '2024-10-23 14:15:00'),
+
+-- Logs for ticket ID 13 (Bayu Adi Pratama) - In Review
+(13, NULL, 'submitted', NULL, '2024-10-29 16:00:00'),
+(13, 2, 'in_review', 'Meninjau prestasi untuk kompetisi programming internasional', '2024-10-29 17:30:00'),
+
+-- Logs for ticket ID 14 (Cindy Maharani) - Valid ticket
+(14, NULL, 'submitted', NULL, '2024-10-28 11:30:00'),
+(14, 4, 'in_review', 'Reviewing portfolio design', '2024-10-28 13:00:00'),
+(14, 4, 'valid', 'Portfolio sangat impressive, disetujui untuk magang', '2024-10-28 15:45:00'),
+
+-- Logs for ticket ID 15 (Ahmad Fauzi) - Submitted
+(15, NULL, 'submitted', NULL, '2024-10-31 08:15:00'),
+
+-- Logs for ticket ID 16 (Diana Sari) - In Review
+(16, NULL, 'submitted', NULL, '2024-10-31 09:30:00'),
+(16, 2, 'in_review', 'Meninjau proposal penelitian marketing digital', '2024-10-31 10:45:00'),
+
+-- Logs for ticket ID 17 (Rizki Pratama) - Valid ticket
+(17, NULL, 'submitted', NULL, '2024-10-31 10:45:00'),
+(17, 3, 'in_review', 'Memeriksa persyaratan program CA', '2024-10-31 12:00:00'),
+(17, 3, 'valid', 'IPK memenuhi syarat, dokumen lengkap', '2024-10-31 14:20:00'),
+
+-- Logs for ticket ID 18 (Sari Indah) - Generated ticket
+(18, NULL, 'submitted', NULL, '2024-10-31 11:00:00'),
+(18, 2, 'in_review', 'Verifikasi persyaratan wisuda', '2024-10-31 13:30:00'),
+(18, 2, 'valid', 'Memenuhi syarat wisuda', '2024-10-31 15:00:00'),
+(18, 1, 'generated', 'Surat untuk wisuda telah diterbitkan', '2024-10-31 16:30:00');

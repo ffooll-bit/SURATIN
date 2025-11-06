@@ -477,6 +477,9 @@ if (!isset($_SESSION['admin_logged_in'])) {
                     // Set new section
                     this.currentSection = newSection;
 
+                    // Save current section to localStorage
+                    this.saveCurrentSection(newSection);
+
                     // Update UI
                     this.updateNavigation(newSection);
                     
@@ -488,6 +491,34 @@ if (!isset($_SESSION['admin_logged_in'])) {
                 } finally {
                     this.isTransitioning = false;
                 }
+            }
+
+            // Save current section to localStorage
+            saveCurrentSection(section) {
+                try {
+                    localStorage.setItem('adminCurrentSection', section);
+                } catch (error) {
+                    console.warn('Could not save current section to localStorage:', error);
+                }
+            }
+
+            // Load saved section from localStorage
+            loadSavedSection() {
+                try {
+                    const savedSection = localStorage.getItem('adminCurrentSection');
+                    if (savedSection && this.isValidSection(savedSection)) {
+                        return savedSection;
+                    }
+                } catch (error) {
+                    console.warn('Could not load saved section from localStorage:', error);
+                }
+                return 'dashboard'; // Default section
+            }
+
+            // Check if section is valid
+            isValidSection(section) {
+                const validSections = ['dashboard', 'tickets', 'templates', 'settings'];
+                return validSections.includes(section);
             }
 
             updateNavigation(section) {
@@ -740,9 +771,10 @@ if (!isset($_SESSION['admin_logged_in'])) {
         document.addEventListener('DOMContentLoaded', function() {
             loadAdminInfo();
             
-            // Initialize section manager and load default section
+            // Initialize section manager and load saved or default section
             if (sectionManager) {
-                showSection('dashboard'); // Load dashboard by default
+                const sectionToLoad = sectionManager.loadSavedSection();
+                showSection(sectionToLoad); // Load saved section or default dashboard
             }
             
             startServerTimeSync(); // Start server time sync

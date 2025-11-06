@@ -244,7 +244,7 @@ class TicketLog {
                     'action' => $log['action'],
                     'action_label' => $this->getActionLabel($log['action']),
                     'note' => $log['note'],
-                    'admin_name' => $log['admin_name'] ?? ($log['action'] === 'submitted' ? 'Sistem' : null),
+                    'admin_name' => $log['admin_name'],
                     'admin_username' => $log['admin_username'],
                     'created_at' => $log['created_at'],
                     'formatted_date' => date('d/m/Y H:i', strtotime($log['created_at']))

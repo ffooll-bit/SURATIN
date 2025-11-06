@@ -151,6 +151,9 @@ async function loadTicketsData() {
                 </td>
             </tr>
         `;
+        
+        // Hide export buttons when there's an error
+        updateExportButtons();
     }
 }
 
@@ -266,6 +269,9 @@ function renderTicketsTable() {
     
     // Update select all state after rendering
     updateSelectAllState();
+    
+    // Update export buttons visibility
+    updateExportButtons();
 }
 
 function renderPagination() {
@@ -324,6 +330,59 @@ function changePage(page) {
 function updateCounters() {
     document.getElementById('showingCount').textContent = filteredTickets.length;
     document.getElementById('totalCount').textContent = ticketsData.length;
+}
+
+// Function to show/hide export buttons based on data availability
+function updateExportButtons() {
+    const hasData = filteredTickets.length > 0;
+    
+    // Find export buttons
+    const exportPdfBtn = document.querySelector('button[onclick*="exportTickets(\'pdf\')"]');
+    const exportCsvBtn = document.querySelector('button[onclick*="exportTickets(\'csv\')"]');
+    const exportDropdown = document.querySelector('.dropdown-toggle[data-bs-toggle="dropdown"]');
+    
+    // Update PDF button
+    if (exportPdfBtn) {
+        if (hasData) {
+            exportPdfBtn.style.display = '';
+            exportPdfBtn.disabled = false;
+            exportPdfBtn.title = 'Export ke PDF';
+        } else {
+            exportPdfBtn.style.display = 'none';
+        }
+    }
+    
+    // Update CSV button  
+    if (exportCsvBtn) {
+        if (hasData) {
+            exportCsvBtn.style.display = '';
+            exportCsvBtn.disabled = false;
+            exportCsvBtn.title = 'Export ke CSV';
+        } else {
+            exportCsvBtn.style.display = 'none';
+        }
+    }
+    
+    // Update export dropdown if it exists
+    if (exportDropdown) {
+        if (hasData) {
+            exportDropdown.style.display = '';
+            exportDropdown.disabled = false;
+            exportDropdown.title = 'Export Data';
+        } else {
+            exportDropdown.style.display = 'none';
+        }
+    }
+    
+    // Alternative: Find by parent container class if buttons are in specific containers
+    const exportContainer = document.querySelector('.export-buttons, .export-actions, [class*="export"]');
+    if (exportContainer) {
+        if (hasData) {
+            exportContainer.style.display = '';
+        } else {
+            exportContainer.style.display = 'none';
+        }
+    }
 }
 
 function applyFilters() {
@@ -387,7 +446,7 @@ function clearFilters() {
     renderTicketsTable();
 }
 
-function refreshTickets() {
+async function refreshTickets() {
     // Clear selections when refreshing
     selectedTickets.clear();
     updateBulkActions();

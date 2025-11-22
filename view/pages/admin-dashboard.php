@@ -293,6 +293,7 @@ if (!isset($_SESSION['admin_logged_in'])) {
                 // Clear localStorage
                 localStorage.removeItem('adminSession');
                 localStorage.removeItem('rememberAdmin');
+                localStorage.removeItem('adminCurrentSection'); // Clear saved section to prevent resuming previous view after logout
                 
                 // Call logout API to clear server session
                 fetch('controller/api/auth.php', {

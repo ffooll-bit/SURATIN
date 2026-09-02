@@ -1,4 +1,14 @@
-# SURATIN
+<div align="center">
+
+<h1>SURATIN</h1>
+
+<img src="docs/social-preview.png" alt="SURATIN - Sistem Urus Surat Terintegrasi, a web ticket system for student letter requests">
+
+**SURATIN** (Sistem Urus Surat Terintegrasi) - a web ticket system for managing student letter requests at academic institutions.
+
+</div>
+
+## Overview
 
 SURATIN (Sistem Urus Surat Terintegrasi) is a web application for managing letter requests at an academic institution. Students submit letter requests as tickets (name, NPM, study program, letter type, attachments, contact) and track their status, while admins review submissions and mark them valid or rejected.
 

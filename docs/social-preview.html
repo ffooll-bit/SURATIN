@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SURATIN Social Preview</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #f8f9fa;
+    --surface: #ffffff;
+    --surface1: #e9ecef;
+    --border: #dee2e6;
+    --text: #212529;
+    --text-muted: #6c757d;
+    --accent: #0d6efd;
+    --accent-dark: #0056b3;
+    --success: #198754;
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    --font-mono: 'Consolas', 'Monaco', 'Courier New', monospace;
+  }
+  html, body { width: 1280px; height: 640px; overflow: hidden; }
+  body { font-family: var(--font); }
+
+  .frame {
+    width: 1280px;
+    height: 640px;
+    padding: 53px;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .main {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    gap: 48px;
+  }
+
+  .brand { flex: 0 0 520px; }
+  .logo-row { display: flex; align-items: center; gap: 18px; margin-bottom: 22px; }
+  .logo {
+    width: 64px; height: 64px; flex-shrink: 0;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0.5rem 1.5rem rgba(13, 110, 253, 0.25);
+  }
+  .logo svg { width: 36px; height: 36px; color: #ffffff; }
+  .logo-cap {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+  h1 {
+    font-size: 44px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    line-height: 1.08;
+  }
+  .subtitle {
+    margin-top: 8px;
+    font-size: 19px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .desc {
+    margin-top: 18px;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--text);
+    opacity: 0.92;
+    max-width: 500px;
+  }
+  .chips { margin-top: 26px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .chip {
+    padding: 8px 16px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 0.4px;
+  }
+
+  .visual {
+    flex: 1;
+    min-width: 0;
+    min-height: 320px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    box-shadow: 0 0.75rem 1.5rem rgba(33, 37, 41, 0.08);
+  }
+  .window-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: var(--surface1);
+    border-bottom: 1px solid var(--border);
+  }
+  .window-dots { display: flex; gap: 6px; }
+  .window-dots i { width: 12px; height: 12px; border-radius: 50%; display: block; }
+  .window-dots i:nth-child(1) { background: #ff5f57; }
+  .window-dots i:nth-child(2) { background: #febc2e; }
+  .window-dots i:nth-child(3) { background: #28c840; }
+  .window-url {
+    margin: 0 auto;
+    padding: 3px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.3px;
+  }
+  .window-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 26px 30px;
+    background: var(--bg);
+  }
+  .mock-card {
+    width: 100%;
+    max-width: 360px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    overflow: hidden;
+  }
+  .mock-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--surface1);
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .mock-card-head code { color: var(--accent); font-weight: 700; }
+  .mock-card-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .mock-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+  .mock-row .k { color: var(--text-muted); font-size: 12px; }
+  .mock-row .v { font-weight: 600; }
+  .badge-valid {
+    padding: 5px 14px;
+    border-radius: 999px;
+    background: #d1e7dd;
+    color: var(--success);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+  .timeline { position: relative; width: 100%; max-width: 380px; display: flex; }
+  .timeline::before {
+    content: "";
+    position: absolute;
+    top: 7px;
+    left: 12%;
+    right: 12%;
+    height: 2px;
+    background: var(--surface1);
+  }
+  .timeline-step { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .step-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--surface1);
+    position: relative;
+    z-index: 1;
+    font-size: 10px;
+    line-height: 16px;
+    text-align: center;
+    color: #fff;
+    font-weight: 700;
+    font-family: sans-serif;
+  }
+  .step-dot.done { background: var(--accent); }
+  .step-dot.active { background: var(--success); }
+  .step-label { font-size: 10px; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text-muted); }
+  .step-label.active { color: var(--success); font-weight: 700; }
+
+  .footer {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    letter-spacing: 0.3px;
+  }
+</style>
+</head>
+<body>
+  <div class="frame">
+    <div class="main">
+      <div class="brand">
+        <div class="logo-row">
+          <div class="logo" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M2 2a2 2 0 0 0-2 2v8.01A2 2 0 0 0 2 14h5.5a.5.5 0 0 0 0-1H2a1 1 0 0 1-.966-.741l5.64-3.471L8 9.583l7-4.2V8.5a.5.5 0 0 0 1 0V4a2 2 0 0 0-2-2zm3.708 6.208L1 11.105V5.383zM1 4.217V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v.217l-7 4.2z"/>
+              <path d="M16 12.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0m-1.993-1.679a.5.5 0 0 0-.686.172l-1.17 1.95-.547-.547a.5.5 0 0 0-.708.708l.774.773a.75.75 0 0 0 1.174-.144l1.335-2.226a.5.5 0 0 0-.172-.686"/>
+            </svg>
+          </div>
+          <span class="logo-cap">SURATIN</span>
+        </div>
+        <h1>SURATIN</h1>
+        <div class="subtitle">Sistem Urus Surat Terintegrasi</div>
+        <p class="desc">A PHP + MySQL web application for academic letter requests — students submit and track, admins review.</p>
+        <div class="chips">
+          <span class="chip">PHP</span>
+          <span class="chip">MySQL</span>
+          <span class="chip">Bootstrap</span>
+          <span class="chip">REST API</span>
+        </div>
+      </div>
+
+      <div class="visual">
+        <div class="window-bar">
+          <div class="window-dots"><i></i><i></i><i></i></div>
+          <span class="window-url">SURATIN</span>
+        </div>
+        <div class="window-body">
+          <div class="mock-card">
+            <div class="mock-card-head">
+              <span>Ticket</span>
+              <code>TCK-20260902-0042</code>
+            </div>
+            <div class="mock-card-body">
+              <div class="mock-row"><span class="k">Jenis</span><span class="v">Surat Keterangan Aktif</span></div>
+              <div class="mock-row"><span class="k">NPM</span><span class="v">2017301050</span></div>
+              <div class="mock-row"><span class="k">Program</span><span class="v">D-III Administrasi</span></div>
+              <div class="mock-row"><span class="k">Status</span><span class="badge-valid">VALID</span></div>
+            </div>
+          </div>
+          <div class="timeline">
+            <div class="timeline-step">
+              <div class="step-dot done">&#10003;</div>
+              <div class="step-label">Submitted</div>
+            </div>
+            <div class="timeline-step">
+              <div class="step-dot done">&#10003;</div>
+              <div class="step-label">In Review</div>
+            </div>
+            <div class="timeline-step">
+              <div class="step-dot active">&#10003;</div>
+              <div class="step-label active">Valid</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <span>FFOOLL-BIT / SURATIN</span>
+      <span>MIT · Sistem Urus Surat Terintegrasi</span>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,414 @@
+<?php
+require_once __DIR__ . '/../../controller/config/app.php';
+?>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - <?= APP_NAME; ?></title>
+    <link href="view/assets/bootstrap-5.3.8/css/bootstrap.min.css" rel="stylesheet">
+    <link href="view/assets/bootstrap-icons-1.13.1/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+        .login-container {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+            overflow: hidden;
+        }
+        .login-header {
+            background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        .login-form {
+            padding: 2rem;
+        }
+        .form-floating .form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+        }
+        .password-toggle {
+            cursor: pointer;
+            padding: 0.375rem 0.75rem;
+            border: none;
+            background: none;
+            color: #6c757d;
+        }
+        .password-toggle:hover {
+            color: #0d6efd;
+        }
+        .login-footer {
+            background: #f8f9fa;
+            padding: 1rem 2rem;
+            border-top: 1px solid #dee2e6;
+            text-align: center;
+        }
+        .brand-logo {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+        }
+        .alert-demo {
+            margin-top: 1rem;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5 col-xl-4">
+                <div class="login-container">
+                    <!-- Header -->
+                    <div class="login-header">
+                        <div class="brand-logo">
+                            <i class="bi bi-shield-lock"></i>
+                        </div>
+                        <h3 class="mb-2"><?= APP_NAME; ?></h3>
+                        <p class="mb-0">Admin Panel</p>
+                    </div>
+
+                    <!-- Login Form -->
+                    <div class="login-form">
+                        <form id="loginForm" novalidate>
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="username" name="username" placeholder="Username" required autocomplete="username">
+                                <label for="username">Username</label>
+                                <div class="invalid-feedback">Username wajib diisi</div>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Password" required autocomplete="current-password">
+                                <label for="password">Password</label>
+                                <div class="invalid-feedback">Password wajib diisi</div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="rememberMe" name="remember">
+                                    <label class="form-check-label" for="rememberMe">
+                                        Ingat saya
+                                    </label>
+                                </div>
+                                <button type="button" class="btn btn-link btn-sm password-toggle p-0 text-decoration-none" onclick="togglePassword()">
+                                    <i class="bi bi-eye me-1" id="passwordIcon"></i>
+                                    <span id="toggleText">Lihat Password</span>
+                                </button>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg" id="loginButton">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i>
+                                    <span id="loginButtonText">Masuk</span>
+                                    <div class="spinner-border spinner-border-sm ms-2 d-none" id="loginSpinner"></div>
+                                </button>
+                            </div>
+
+                            <!-- Demo Credentials Alert -->
+                            <div class="alert alert-info alert-demo">
+                                <h6><i class="bi bi-info-circle me-2"></i>Demo Accounts</h6>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <strong>Super Admin:</strong><br>
+                                        Username: super
+                                        <hr class="my-2">
+                                        <strong>Admin BAAK:</strong><br>
+                                        Username: baak_admin
+                                        <hr class="my-2">
+                                        <strong>Administrator:</strong><br>
+                                        Username: admin
+                                        <hr class="my-2">
+                                        <strong>Kemahasiswaan:</strong><br>
+                                        Username: kemahasiswaan
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Semua akun menggunakan password default: <strong>password</strong>
+                                    </small>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="login-footer">
+                        <small class="text-muted">
+                            © <?= date('Y'); ?> <?= APP_NAME; ?>. <?= APP_DESCRIPTION; ?>
+                            <?php if (defined('APP_DEV') && APP_DEV): ?>
+                                <br><span class="text-muted">Developed by <?= APP_DEV; ?></span>
+                            <?php endif; ?>
+                            <?php if (DEBUG_MODE): ?>
+                                <br><span class="badge bg-warning text-dark">Development Mode</span>
+                            <?php endif; ?>
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Back to Public -->
+                <div class="text-center mt-3">
+                    <a href="index.php" class="text-white text-decoration-none">
+                        <i class="bi bi-arrow-left me-2"></i>Kembali ke Halaman Utama
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div id="loginToast" class="toast" role="alert">
+            <div class="toast-header">
+                <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                <strong class="me-auto">Login</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="toastMessage">
+                <!-- Toast message will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="view/assets/bootstrap-5.3.8/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Configuration from PHP
+        const APP_CONFIG = {
+            name: '<?= APP_NAME; ?>',
+            description: '<?= APP_DESCRIPTION; ?>',
+            version: '<?= APP_VERSION; ?>',
+            dev: '<?= APP_DEV; ?>',
+            debugMode: <?= DEBUG_MODE ? 'true' : 'false'; ?>,
+            sessionLifetime: <?= SESSION_LIFETIME; ?>
+        };
+
+        // Toggle password visibility
+        function togglePassword() {
+            const passwordField = document.getElementById('password');
+            const passwordIcon = document.getElementById('passwordIcon');
+            const toggleText = document.getElementById('toggleText');
+            
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                passwordIcon.className = 'bi bi-eye-slash me-1';
+                toggleText.textContent = 'Sembunyikan';
+            } else {
+                passwordField.type = 'password';
+                passwordIcon.className = 'bi bi-eye me-1';
+                toggleText.textContent = 'Lihat Password';
+            }
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'warning') {
+            const toast = document.getElementById('loginToast');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastHeader = toast.querySelector('.toast-header i');
+            
+            // Update toast content
+            toastMessage.textContent = message;
+            
+            // Update toast icon based on type
+            if (type === 'success') {
+                toastHeader.className = 'bi bi-check-circle text-success me-2';
+            } else if (type === 'error') {
+                toastHeader.className = 'bi bi-exclamation-triangle text-danger me-2';
+            } else {
+                toastHeader.className = 'bi bi-exclamation-triangle text-warning me-2';
+            }
+            
+            // Show toast
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+        }
+
+        // Set loading state
+        function setLoading(isLoading) {
+            const loginButton = document.getElementById('loginButton');
+            const loginButtonText = document.getElementById('loginButtonText');
+            const loginSpinner = document.getElementById('loginSpinner');
+            
+            if (isLoading) {
+                loginButton.disabled = true;
+                loginButtonText.textContent = 'Memproses...';
+                loginSpinner.classList.remove('d-none');
+            } else {
+                loginButton.disabled = false;
+                loginButtonText.textContent = 'Masuk';
+                loginSpinner.classList.add('d-none');
+            }
+        }
+
+        // Validate form
+        function validateForm() {
+            const form = document.getElementById('loginForm');
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            // Reset previous validation
+            form.classList.remove('was-validated');
+            
+            let isValid = true;
+            
+            // Check if fields are empty
+            if (!username) {
+                document.getElementById('username').setCustomValidity('Username wajib diisi');
+                isValid = false;
+            } else {
+                document.getElementById('username').setCustomValidity('');
+            }
+            
+            if (!password) {
+                document.getElementById('password').setCustomValidity('Password wajib diisi');
+                isValid = false;
+            } else {
+                document.getElementById('password').setCustomValidity('');
+            }
+            
+            form.classList.add('was-validated');
+            return isValid;
+        }
+
+        // Handle login - Updated to use API
+        function handleLogin(username, password) {
+            return new Promise((resolve, reject) => {
+                fetch('controller/api/auth.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Also store in localStorage for frontend use
+                        const sessionData = {
+                            username: data.user.username,
+                            name: data.user.name,
+                            role: data.user.role,
+                            email: data.user.email,
+                            loginTime: new Date().toISOString(),
+                            sessionLifetime: APP_CONFIG.sessionLifetime
+                        };
+                        localStorage.setItem('adminSession', JSON.stringify(sessionData));
+                        resolve(data.user);
+                    } else {
+                        reject(data.error || 'Login gagal');
+                    }
+                })
+                .catch(error => {
+                    console.error('Login error:', error);
+                    reject('Terjadi kesalahan saat login. Silakan coba lagi.');
+                });
+            });
+        }
+
+        // Form submission
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!validateForm()) {
+                return;
+            }
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            
+            setLoading(true);
+            
+            try {
+                const userData = await handleLogin(username, password);
+                
+                // Store remember me preference
+                if (rememberMe) {
+                    localStorage.setItem('rememberAdmin', username);
+                } else {
+                    localStorage.removeItem('rememberAdmin');
+                }
+                
+                showToast('Login berhasil! Mengalihkan ke dashboard...', 'success');
+                
+                // Redirect to admin dashboard after short delay
+                setTimeout(() => {
+                    window.location.href = 'index.php?page=admin';
+                }, 2000);
+                
+            } catch (error) {
+                setLoading(false);
+                showToast(error, 'error');
+            }
+        });
+
+        // Auto-fill remembered username
+        document.addEventListener('DOMContentLoaded', function() {
+            const rememberedUser = localStorage.getItem('rememberAdmin');
+            if (rememberedUser) {
+                document.getElementById('username').value = rememberedUser;
+                document.getElementById('rememberMe').checked = true;
+                // Focus on password field
+                document.getElementById('password').focus();
+            } else {
+                // Focus on username field
+                document.getElementById('username').focus();
+            }
+
+            // Debug info if in development mode
+            if (APP_CONFIG.debugMode) {
+                console.log('App Config:', APP_CONFIG);
+                console.log('Session Lifetime:', APP_CONFIG.sessionLifetime, 'seconds');
+            }
+        });
+
+        // Handle Enter key in password field
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+            }
+        });
+
+        // Session timeout warning (using configuration)
+        function checkSessionTimeout() {
+            const adminSession = localStorage.getItem('adminSession');
+            if (adminSession) {
+                try {
+                    const session = JSON.parse(adminSession);
+                    const loginTime = new Date(session.loginTime);
+                    const now = new Date();
+                    const sessionDuration = (now - loginTime) / 1000; // in seconds
+                    const sessionLifetime = session.sessionLifetime || APP_CONFIG.sessionLifetime;
+                    
+                    // Warn when 90% of session time has passed
+                    if (sessionDuration > sessionLifetime * 0.9) {
+                        showToast('Sesi akan berakhir dalam ' + Math.round((sessionLifetime - sessionDuration) / 60) + ' menit', 'warning');
+                    }
+                } catch (e) {
+                    console.error('Error parsing session data:', e);
+                }
+            }
+        }
+
+        // Check session timeout every 5 minutes
+        setInterval(checkSessionTimeout, 5 * 60 * 1000);
+    </script>
+</body>
+</html>

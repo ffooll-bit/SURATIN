@@ -1,0 +1,307 @@
+<!-- Tickets Management Content -->
+<div class="tickets-container">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Manajemen Tickets</h2>
+            <p class="text-muted mb-0">Kelola semua ticket yang masuk ke sistem</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-primary" onclick="refreshTickets()" title="Refresh data">
+                <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+            </button>
+            <button class="btn btn-success" onclick="showCreateTicketModal()" title="Buat ticket baru">
+                <i class="bi bi-plus-circle me-1"></i>Buat Ticket
+            </button>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card stats-card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="card-title mb-1" id="totalTickets">0</h3>
+                            <p class="card-text mb-0">Total Tickets</p>
+                        </div>
+                        <div class="stats-icon bg-light bg-opacity-25">
+                            <i class="bi bi-ticket-detailed text-white"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card stats-card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="card-title mb-1" id="submittedTickets">0</h3>
+                            <p class="card-text mb-0">Submitted</p>
+                        </div>
+                        <div class="stats-icon bg-light bg-opacity-25">
+                            <i class="bi bi-file-earmark-plus text-white"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card stats-card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="card-title mb-1" id="inReviewTickets">0</h3>
+                            <p class="card-text mb-0">In Review</p>
+                        </div>
+                        <div class="stats-icon bg-light bg-opacity-25">
+                            <i class="bi bi-hourglass-split text-white"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card stats-card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="card-title mb-1" id="generatedTickets">0</h3>
+                            <p class="card-text mb-0">Generated</p>
+                        </div>
+                        <div class="stats-icon bg-light bg-opacity-25">
+                            <i class="bi bi-file-earmark-check text-white"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters and Search -->
+    <div class="card filter-card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="searchTickets" class="form-label">Cari Tickets</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" id="searchTickets" 
+                               placeholder="Nomor ticket, nama, atau email...">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <label for="statusFilter" class="form-label">Status</label>
+                    <select class="form-select" id="statusFilter">
+                        <option value="">Semua Status</option>
+                        <option value="submitted">Submitted</option>
+                        <option value="in_review">In Review</option>
+                        <option value="valid">Valid</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="generated">Generated</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="typeFilter" class="form-label">Jenis Surat</label>
+                    <select class="form-select" id="typeFilter">
+                        <option value="">Semua Jenis</option>
+                        <option value="surat_keterangan">Surat Keterangan</option>
+                        <option value="surat_pengantar">Surat Pengantar</option>
+                        <option value="surat_domisili">Surat Domisili</option>
+                        <option value="surat_usaha">Surat Usaha</option>
+                        <option value="surat_tidak_mampu">Surat Tidak Mampu</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="dateFilter" class="form-label">Tanggal</label>
+                    <input type="date" class="form-control" id="dateFilter">
+                </div>
+                <div class="col-md-2">
+                    <label for="sortFilter" class="form-label">Urutkan</label>
+                    <select class="form-select" id="sortFilter">
+                        <option value="created_desc">Terbaru</option>
+                        <option value="created_asc">Terlama</option>
+                        <option value="status_asc">Status A-Z</option>
+                        <option value="name_asc">Nama A-Z</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12 d-flex flex-wrap gap-2">
+                    <button class="btn btn-primary me-2" onclick="applyFilters()">
+                        <i class="bi bi-funnel me-1"></i>Terapkan Filter
+                    </button>
+                    <button class="btn btn-outline-secondary" onclick="clearFilters()">
+                        <i class="bi bi-x-circle me-1"></i>Reset Filter
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tickets Table -->
+    <div class="card ticket-table">
+        <div class="card-header bg-white border-bottom">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Daftar Tickets</h5>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="text-muted">Menampilkan <span id="showingCount">0</span> dari <span id="totalCount">0</span> tickets</span>
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-sm btn-outline-primary" onclick="exportTickets('csv')" title="Export ke CSV">
+                            <i class="bi bi-file-earmark-excel"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary" onclick="exportTickets('pdf')" title="Export ke PDF">
+                            <i class="bi bi-file-earmark-pdf"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col" class="text-center" style="width: 50px;">
+                                <input type="checkbox" class="form-check-input" id="selectAll" onchange="toggleSelectAll()">
+                            </th>
+                            <th scope="col" style="width: 150px;">Nomor Ticket</th>
+                            <th scope="col">Nama Pemohon</th>
+                            <th scope="col">Jenis Surat</th>
+                            <th scope="col" class="text-center" style="width: 120px;">Status</th>
+                            <th scope="col" style="width: 130px;">Tanggal</th>
+                            <th scope="col" class="text-center" style="width: 150px;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ticketsTableBody">
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Memuat data...</span>
+                                </div>
+                                <p class="mt-2 text-muted">Memuat data tickets...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-white border-top">
+            <nav aria-label="Pagination">
+                <ul class="pagination pagination-sm mb-0 justify-content-center" id="pagination">
+                    <!-- Pagination will be generated here -->
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Bulk Actions (shown when tickets are selected) -->
+    <div class="card mt-3" id="bulkActionsCard" style="display: none;">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="text-muted">
+                    <span id="selectedCount">0</span> tickets dipilih
+                </span>
+                <div class="btn-group">
+                    <button class="btn btn-sm btn-primary" onclick="bulkUpdateStatus('generated')">
+                        <i class="bi bi-file-earmark-check me-1"></i>Buat Surat
+                    </button>
+                    <button class="btn btn-sm btn-success" onclick="bulkUpdateStatus('valid')">
+                        <i class="bi bi-check-circle me-1"></i>Valid
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="bulkUpdateStatus('rejected')">
+                        <i class="bi bi-x-circle me-1"></i>Tolak
+                    </button>
+                    <button class="btn btn-sm btn-warning" onclick="bulkUpdateStatus('in_review')">
+                        <i class="bi bi-search me-1"></i>Review
+                    </button>
+                    <button class="btn btn-sm btn-info" onclick="bulkUpdateStatus('submitted')">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i>Submit Ulang
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="bulkDelete()">
+                        <i class="bi bi-trash me-1"></i>Hapus
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ticket Detail Modal -->
+<div class="modal fade" id="ticketDetailModal" tabindex="-1" aria-labelledby="ticketDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ticketDetailModalLabel">Detail Ticket</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="ticketDetailContent">
+                <!-- Content loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create/Edit Ticket Modal -->
+<div class="modal fade" id="createTicketModal" tabindex="-1" aria-labelledby="createTicketModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createTicketModalLabel">Buat Ticket Baru</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="createTicketForm">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="ticketName" class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="ticketName" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="ticketEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="ticketEmail">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="ticketPhone" class="form-label">No. Telepon</label>
+                            <input type="tel" class="form-control" id="ticketPhone">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="ticketNik" class="form-label">NIK <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="ticketNik" maxlength="16" required>
+                        </div>
+                        <div class="col-12">
+                            <label for="ticketType" class="form-label">Jenis Surat <span class="text-danger">*</span></label>
+                            <select class="form-select" id="ticketType" required>
+                                <option value="">Pilih Jenis Surat</option>
+                                <option value="surat_keterangan">Surat Keterangan</option>
+                                <option value="surat_pengantar">Surat Pengantar</option>
+                                <option value="surat_domisili">Surat Domisili</option>
+                                <option value="surat_usaha">Surat Usaha</option>
+                                <option value="surat_tidak_mampu">Surat Tidak Mampu</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label for="ticketPurpose" class="form-label">Keperluan <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="ticketPurpose" rows="3" required></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label for="ticketNotes" class="form-label">Catatan Tambahan</label>
+                            <textarea class="form-control" id="ticketNotes" rows="2" placeholder="Catatan tambahan untuk ticket ini (opsional)"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-1"></i>Simpan Ticket
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

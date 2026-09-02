@@ -22,3 +22,9 @@ temp/
 # Local scratch
 *.log
 *.tmp
+
+# Tooling artifacts
+reports/
+
+# Agent workspace (Magic Context)
+.cortexkit/

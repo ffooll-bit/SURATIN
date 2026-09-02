@@ -25,6 +25,7 @@ temp/
 
 # Tooling artifacts
 reports/
+.playwright-mcp/
 
 # Agent workspace (Magic Context)
 .cortexkit/

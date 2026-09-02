@@ -1,335 +1,36 @@
 # SURATIN
-SURATIN (Sistem Urus Surat Terintegrasi) adalah aplikasi berbasis web yang membantu pengurusan surat secara efisien
 
-## Phase A — Persiapan umum (sebelum coding)
+SURATIN (Sistem Urus Surat Terintegrasi) is a web application for managing letter requests at an academic institution. Students submit letter requests as tickets (name, NPM, study program, letter type, attachments, contact) and track their status, while admins review submissions and mark them valid or rejected.
 
-1. Buat repository dan branch awal
-   * `main` / `develop` / `ui` (mulai di `ui` untuk tampilan)
-   * README web project (tujuan, stack: PHP + MySQL, Bootstrap/Tailwind, XAMPP)
-2. Tentukan tooling Copilot workflow
-   * Aturan commit kecil (1 fitur UI per PR/commit), deskripsi commit, dan file scope.
-3. Siapkan environment lokal XAMPP
-   * Database kosong, virtual host (mis. `surat.local`), folder project di `htdocs/`
+## Features
 
-## Phase B — Desain UI (prioritas utama)
+- Public ticket submission form with client-side validation
+- Public ticket status tracking with activity history
+- Admin dashboard with ticket list, filters, and statistics
+- Ticket review workflow (valid / rejected) with activity logs
+- Session-based admin authentication with role support
+- REST API endpoints served from `controller/api/`
 
-Tujuan: hasilkan komponen HTML/CSS/JS yang bisa diuji tanpa backend (mock data). Fokus pada kemudahan reviewer/admin.
+## Installation
 
-### 1. Halaman publik (Ticketing / Form input)
+Requires PHP and MySQL (XAMPP is the reference environment). Place the project under the web root (e.g. `htdocs/SURATIN`), then from the project root with MySQL running:
 
-* Komponen/form:
-  * Form pengisian ticket (field dinamis sesuai jenis surat): Nama, NPM, Prodi, Jenis Surat (dropdown), Lampiran (upload), Email, No WA.
-  * Tombol Submit + summary modal.
-  * Validasi sisi-klien (JS): required, format email, ukuran file.
-* Halaman success + nomor ticket (ID ticket ditampilkan) + CTA (cek status).
-* Komponen responsif (mobile + desktop).
-* Microcopy & helper text (contoh format NPM, file size).
-
-### 2. Halaman cek status ticket (publik)
-
-* Input: Nomor ticket / Email + Captcha sederhana (opsional).
-* Status bar: Submitted → In Review → Valid / Rejected → Surat Dihasilkan (link/download).
-* Riwayat aktivitas (log brief).
-
-### 3. Halaman admin (akses via login)
-
-* Dashboard ringkas: jumlah ticket aktif, ticket baru (recent), notifikasi (bell).
-* Ticket list (tabel) dengan kolom: ID, Nama, Jenis Surat, Tanggal, Status, Aksi (Review, Detail).
-  * Filter (status, jenis surat), search (nama/NPM/ID).
-* Ticket detail view:
-  * Tampilkan semua data input + preview dokumen (jika template data sudah lengkap show preview placeholder) + lampiran.
-  * Tombol: Mark as Valid → Generate Surat, Mark as Invalid → Kirim Rejection (template alasan).
-  * Tombol untuk edit minor data sebelum generate.
-* Template management (Admin level higher):
-  * Upload template .docx, set mapping placeholder ke field.
-* Pengaturan penomoran: set zero padding, last_number, mode (skip/offset).
-
-### 4. Modals & UI patterns
-
-* Modal konfirmasi (generate surat), modal alasan reject.
-* Toast / Alerts untuk feedback.
-* Komponen file upload (drag & drop).
-
-### 5. Style system
-
-* Pilih: **Bootstrap** (faster for Copilot) atau **Tailwind** (lebih fleksibel).
-  * Saya rekomendasi: **Bootstrap 5** jika ingin cepat dan siap pakai; **Tailwind** kalau mau custom UI modern.
-* Buat design tokens: warna brand (success, warning, danger), spacings, typografi.
-
-## Phase C — Struktur Front-End / Back-End (separasi)
-
-Tujuan: front-end berkomunikasi ke back-end lewat API JSON; admin login via session.
-
-### Konfigurasi Aplikasi
-
-File `controller/config/app.php` berisi:
-* **Timezone**: Asia/Makassar (UTC+8)
-* **Format tanggal**: Indonesia format
-* **File upload**: Maksimal 5MB, tipe yang diizinkan
-* **Session**: 8 jam lifetime
-* **Debug mode**: Berdasarkan environment
-
-### Struktur file (saran)
-
-```
-/SURATIN
-├─ index.php                   # Landing page utama / gateway
-├─ view/                       # Frontend statis (HTML/CSS/JS)
-│  ├─ assets/                  # CSS, JS, images, fonts
-│  │  ├─ css/
-│  │  ├─ js/
-│  │  └─ img/
-│  ├─ pages/                   # Halaman utama
-│  │  ├─ ticket-form.php       # Form pengajuan ticket (menggunakan konfigurasi app.php)
-│  │  ├─ check-status.php      # Cek status ticket (menggunakan konfigurasi app.php)
-│  │  ├─ success.php           # Halaman sukses submit (menggunakan konfigurasi app.php)
-│  │  ├─ admin-login.php       # Login admin (menggunakan konfigurasi app.php)
-│  │  └─ admin-dashboard.php   # Dashboard admin (menggunakan konfigurasi app.php)
-│  └─ components/              # Komponen reusable (modals, etc)
-├─ controller/                 # PHP logika & API endpoints
-│  ├─ api/                     # REST API endpoints
-│  │  ├─ tickets.php           # CRUD tickets
-│  │  ├─ auth.php              # Login/logout admin
-│  │  ├─ dashboard.php         # Dashboard statistics
-│  │  ├─ templates.php         # Kelola template
-│  │  └─ status.php            # Cek status public
-│  ├─ config/                  # Konfigurasi
-│  │  ├─ app.php               # App settings & timezone
-│  │  └─ database.php          # DB connection
-│  └─ helpers/                 # Helper functions
-├─ model/                      # PHP untuk database & data layer
-├─ uploads/                    # File uploads (lampiran)
-├─ storage/                    # Generated files
-└─ sql/                        # Database scripts
+```bash
+php run-schema.php       # create the database and schema
+php run-sample-data.php  # insert sample data
 ```
 
-> Catatan: `index.php` sebagai entry point yang bisa routing ke halaman yang tepat. File di `view/pages/` menggunakan konfigurasi dari `controller/config/app.php` untuk konsistensi data aplikasi.
+## Usage
 
-## Konfigurasi Aplikasi
+Open the project in a browser (e.g. `http://localhost/SURATIN/`). Submit a letter request on the public form, then track it with the ticket code. Admin features require a login (see the seeded admin accounts).
 
-### Central Configuration (`controller/config/app.php`)
+## Documentation
 
-Aplikasi SURATIN menggunakan sistem konfigurasi terpusat yang memungkinkan pengelolaan yang konsisten di seluruh aplikasi:
+- [CHANGELOG.md](CHANGELOG.md) — release history
+- [CONTRIBUTING.md](CONTRIBUTING.md) — how to contribute
+- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) — community standards
+- [SECURITY.md](SECURITY.md) — security policy
 
-```php
-// Pengaturan Aplikasi
-define('APP_NAME', 'SURATIN');
-define('APP_DESCRIPTION', 'Sistem Urus Surat Terintegrasi');
-define('APP_VERSION', '1.0.0');
-define('APP_DEV', 'FFOOLL-BIT');
-define('APP_ENV', 'development'); // development, staging, production
+## License
 
-// Pengaturan Timezone
-define('APP_TIMEZONE', 'Asia/Makassar');
-define('DATE_FORMAT', 'Y-m-d H:i:s');
-define('DISPLAY_DATE_FORMAT', 'd/m/Y H:i');
-
-// Pengaturan Session
-define('SESSION_LIFETIME', 3600 * 8); // 8 jam dalam detik
-
-// Mode Debug (otomatis berdasarkan environment)
-define('DEBUG_MODE', APP_ENV === 'development');
-```
-
-### Integrasi dengan Pages
-
-Semua file di `view/pages/` telah dikonversi menjadi PHP untuk menggunakan konfigurasi ini:
-
-- **Dynamic Title**: `<?= APP_NAME; ?>` - Nama aplikasi konsisten
-- **Meta Description**: Menggunakan `APP_DESCRIPTION` untuk SEO
-- **Footer Information**: Menampilkan developer (`APP_DEV`) dan tahun otomatis
-- **Debug Mode**: Indikator visual saat dalam mode development
-- **Version Display**: Menampilkan versi aplikasi di area admin
-- **JavaScript Config**: Konfigurasi tersedia di frontend melalui `APP_CONFIG`
-
-### Environment-based Features
-
-- **Development Mode**: 
-  - Debug indicator di pojok kanan atas
-  - Console logging yang lebih verbose
-  - Mock data yang lebih lengkap
-  
-- **Production Mode**:
-  - Debug features dinonaktifkan
-  - Error reporting dikurangi
-  - Performance optimizations
-
-## Phase D — Skema Database (MySQL)
-
-Skema minimal untuk ticketing + admin + templates + numbering:
-
-```sql
--- tickets
-CREATE TABLE tickets (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  ticket_code VARCHAR(32) UNIQUE, -- human readable e.g. TCK-20251029-0001
-  nama VARCHAR(255),
-  npm VARCHAR(50),
-  prodi VARCHAR(100),
-  jenis_surat VARCHAR(100),
-  data JSON,           -- fleksibel: menyimpan field tambahan
-  attachments JSON,    -- array {name,path}
-  email VARCHAR(255),
-  wa VARCHAR(30),
-  status ENUM('submitted','in_review','valid','rejected','generated') DEFAULT 'submitted',
-  admin_note TEXT,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP
-);
-
--- users/admin
-CREATE TABLE admins (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  username VARCHAR(100) UNIQUE,
-  password_hash VARCHAR(255),
-  name VARCHAR(255),
-  email VARCHAR(255),
-  role ENUM('admin','super') DEFAULT 'admin',
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-
--- templates
-CREATE TABLE templates (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(255),
-  filename VARCHAR(255),
-  placeholder_map JSON, -- {"{nama_mahasiswa}":"nama", ...}
-  zero_padding INT DEFAULT 3,
-  last_number INT DEFAULT 0,
-  last_number_mode ENUM('skip','offset') DEFAULT 'skip',
-  active TINYINT(1) DEFAULT 1,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-
--- generated letters
-CREATE TABLE letters (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  ticket_id INT,
-  template_id INT,
-  nomor_surat VARCHAR(100),
-  output_file VARCHAR(255),
-  qr_code VARCHAR(255),
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-## Phase E — API Contract (endpoints penting)
-
-Semua endpoint di `controller/api/*` mengembalikan JSON.
-
-### Publik (no auth)
-
-* `POST /controller/api/tickets.php` — submit ticket (payload form / multipart for files) → returns `{ticket_code, status}`
-* `GET /controller/api/status.php?ticket_code=...&email=...` — cek status
-
-### Admin (session auth or token)
-
-* `POST /controller/api/auth.php` — login admin → sets session
-* `GET /controller/api/tickets.php` — list tickets (params filter)
-* `GET /controller/api/tickets.php?id={id}` — detail ticket
-* `POST /controller/api/tickets.php` dengan action=validate — mark valid (body: template_id, optional edits)
-* `POST /controller/api/tickets.php` dengan action=reject — mark reject (body: reason)
-* `POST /controller/api/tickets.php` dengan action=generate — force generate surat
-* `GET /controller/api/templates.php` — list templates
-* `POST /controller/api/templates.php` — upload template
-
-## Phase F — Fungsional Back-End (logika)
-
-1. **Upload & store attachments**
-   * Simpan di `uploads/{ticket_code}/` dan catat path di DB.
-2. **Ticket creation**
-   * generate `ticket_code` (unik), simpan `data` JSON.
-   * kirim notifikasi ke admin (email/WA) bahwa ada ticket baru.
-3. **Admin review flow**
-   * Admin membuka detail → edit/approve/reject.
-   * Saat approve, backend memvalidasi data (required fields) → jika ok lanjut generate surat.
-4. **Generate surat otomatis**
-   * Ambil template .docx → replace placeholders dengan data.
-   * Penomoran: gunakan `templates.last_number` & `zero_padding` & `last_number_mode` (mirror README logic). Update last_number setelah generate.
-   * Konversi DOCX → PDF (opsional) — tools: LibreOffice headless (commandline) atau PHP library (pandoc, unoconv).
-   * Simpan file, insert row di `letters`.
-   * Generate QR code (isi: link verifikasi / nomor surat) — simpan image.
-5. **Notifikasi**
-   * Email: SMTP library (PHPMailer) atau system SMTP (Gmail/SendGrid).
-   * WA: dua pilihan — (a) WhatsApp Business API (resmi, butuh approval), (b) gateway pihak ketiga (tergantung kebijakan). Kirim isi template (valid/rejected/generate link).
-   * Pastikan retry & queue mechanism (simple table `notifications` atau job queue).
-6. **Security**
-   * Admin auth: password hash (bcrypt), session cookie secure, CSRF token di admin forms.
-   * File upload: batasi extension, scan mime-type, simpan outside webroot jika perlu.
-   * Rate-limit submit form, captchas jika spam.
-
-## Phase G — Integrasi dokumen (.docx) dan penomoran
-
-1. Pilih library PHP untuk memanipulasi DOCX:
-   * `phpoffice/phpword` untuk replace placeholders.
-2. Penomoran: implementasikan fungsi `generate_nomor(template_id)` yang memperhitungkan `last_number_mode` (copy logic dari README).
-3. Convert DOCX → PDF:
-   * Prefer LibreOffice headless di server lokal (`libreoffice --headless --convert-to pdf ...`) atau gunakan layanan konversi.
-4. QR Code: gunakan `endroid/qr-code` atau PHP GD.
-
-## Phase H — Notifikasi & Queue
-
-1. Buat tabel `notifications` (id, target, channel, payload, status, retries, last_attempt).
-2. Worker (cron) untuk mengirim notifikasi, retry, mark failed.
-3. Channels: `email`, `whatsapp` (WA integration: send phone number + template).
-
-## Phase I — Testing & Deployment (lokal → production)
-
-1. Unit tests untuk fungsi penomoran, placeholder mapping, API endpoints (bisa memakai PHPUnit).
-2. UAT: jalankan seluruh alur — submit ticket → admin approve → generate → notifikasi.
-3. Deployment: XAMPP (dev). Untuk production: Apache/Nginx + PHP-FPM, backup DB, SSL.
-
-## Checklist implementasi (urutan pekerjaan Copilot-friendly)
-
-> Fokus agar Copilot bisa buat komponen UI dulu; tiap task adalah unit kecil.
-
-### Sprint UI (tahap awal)
-
-1. [x] Buat `index.php` sebagai landing page dengan routing sederhana.
-2. [x] Buat halaman `view/pages/ticket-form.php` (menggunakan konfigurasi dari app.php).
-3. [x] Buat `view/pages/success.php` (menggunakan konfigurasi dari app.php).
-4. [x] Buat `view/pages/check-status.php` (menggunakan konfigurasi dari app.php).
-5. [x] Buat `view/pages/admin-login.php` (menggunakan konfigurasi dari app.php).
-6. [x] Buat `view/pages/admin-dashboard.php` (menggunakan konfigurasi dari app.php).
-7. [x] Komponen `view/components/dashboard-content.html` dengan data real dan activity modal.
-8. [x] Responsiveness & accessibility check.
-
-### Sprint API & DB (setelah UI siap)
-
-9. [x] Buat DB schema (`sql/create-schema.sql`) dan `controller/config/database.php`.
-10. [x] Implement `model/Ticket.php` untuk CRUD operations.
-11. [x] Implement `controller/api/dashboard.php` untuk statistik dan aktivitas real-time.
-12. [x] Setup `controller/config/app.php` untuk timezone dan konfigurasi aplikasi.
-13. [ ] Implement `controller/api/tickets.php` (simpan: tickets + files).
-14. [ ] Implement `controller/api/status.php` untuk cek status publik.
-15. [x] Implement `model/Admin.php` dan `controller/api/auth.php`.
-16. [ ] Implement ticket review di `controller/admin/ticket-review.php`.
-17. [ ] Implement `model/Template.php` dan template manager.
-18. [ ] Implement generate surat di `controller/helpers/docx-generator.php`.
-19. [ ] Implement notifikasi di `controller/helpers/mailer.php` dan `whatsapp.php`.
-20. [ ] Add logging dan error handling.
-
-### Sprint finishing
-
-19. [ ] Tests: unit + integration for full flow.
-20. [ ] Security audit: file upload, auth, SQL injection, XSS.
-21. [ ] Prepare docs: how-to-run, env vars (SMTP, WA creds), endpoints list.
-22. [ ] Optional: add QR verification public page (verifikasi nomor surat).
-
-## Petunjuk implementasi cepat (snippet & tips)
-
-* **Ticket code**: `TCK-YYYYMMDD-<4digit>` generated di `model/Ticket.php`.
-* **Replace placeholders** (contoh phpword di `controller/helpers/docx-generator.php`):
-  ```php
-  $templateProcessor->setValue('{nama_mahasiswa}', $data['nama']);
-  ```
-* **Generate nomor**: salin logic `last_number_mode` dari README (skip vs offset) di `model/Template.php`.
-* **Notifikasi email**: gunakan PHPMailer di `controller/helpers/mailer.php`, jangan hardcode creds; gunakan ENV.
-* **WA integration**: buat adapter interface di `controller/helpers/whatsapp.php` dan implementasi stub lokal dulu.
-
-## Catatan penting / rekomendasi
-
-* Karena kamu ingin **no login untuk user**, pastikan ticket_code + email cukup untuk verifikasi status. Jangan mengekspos data sensitif.
-* Untuk WhatsApp: API resmi memerlukan business verification; selama dev gunakan email + fallback SMS (jika perlu) atau UI in-app notifications (dashboard).
-* Simpan template mapping di DB agar admin bisa ubah tanpa deploy kode.
-* Gunakan job queue (even simple cron polling DB) untuk proses berat: konversi DOCX, pengiriman WA.
+MIT. See [LICENSE](LICENSE).
